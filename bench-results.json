@@ -1,101 +1,247 @@
 {
-  "note": "Synthetic documents, MOCK reading. Measures the comparison logic only, not AI reading quality.",
-  "single_error": {
-    "found": 140,
-    "of": 140,
-    "types": [
-      {
-        "type": "line_total_wrong",
-        "check": "line_totals",
-        "found": 10,
-        "of": 10
-      },
-      {
-        "type": "invoice_sum_wrong",
-        "check": "invoice_sum",
-        "found": 10,
-        "of": 10
-      },
-      {
-        "type": "gross_weight_mismatch",
-        "check": "gross_weight",
-        "found": 10,
-        "of": 10
-      },
-      {
-        "type": "net_weight_mismatch",
-        "check": "net_weight",
-        "found": 10,
-        "of": 10
-      },
-      {
-        "type": "packages_mismatch",
-        "check": "packages",
-        "found": 10,
-        "of": 10
-      },
-      {
-        "type": "qty_mismatch",
-        "check": "item_qty",
-        "found": 10,
-        "of": 10
-      },
-      {
-        "type": "buyer_different",
-        "check": "party_buyer",
-        "found": 10,
-        "of": 10
-      },
-      {
-        "type": "buyer_typo",
-        "check": "party_buyer",
-        "found": 10,
-        "of": 10
-      },
-      {
-        "type": "seller_different",
-        "check": "party_seller",
-        "found": 10,
-        "of": 10
-      },
-      {
-        "type": "date_order_wrong",
-        "check": "date_order",
-        "found": 10,
-        "of": 10
-      },
-      {
-        "type": "hs_mismatch",
-        "check": "hs_match",
-        "found": 10,
-        "of": 10
-      },
-      {
-        "type": "hs_bad_format",
-        "check": "hs_format",
-        "found": 10,
-        "of": 10
-      },
-      {
-        "type": "reference_mismatch",
-        "check": "reference",
-        "found": 10,
-        "of": 10
-      },
-      {
-        "type": "net_gt_gross",
-        "check": "net_le_gross",
-        "found": 10,
-        "of": 10
-      }
-    ]
+  "note": "Synthetic documents, MOCK reading (template parser, not AI). 'template' measures the comparison logic only; 'dirty' measures MOCK parsing + number parsing + comparison on our own messier generator. Neither measures AI reading of real documents.",
+  "template": {
+    "single_error": {
+      "found": 140,
+      "of": 140,
+      "types": [
+        {
+          "type": "line_total_wrong",
+          "check": "line_totals",
+          "found": 10,
+          "of": 10
+        },
+        {
+          "type": "invoice_sum_wrong",
+          "check": "invoice_sum",
+          "found": 10,
+          "of": 10
+        },
+        {
+          "type": "gross_weight_mismatch",
+          "check": "gross_weight",
+          "found": 10,
+          "of": 10
+        },
+        {
+          "type": "net_weight_mismatch",
+          "check": "net_weight",
+          "found": 10,
+          "of": 10
+        },
+        {
+          "type": "packages_mismatch",
+          "check": "packages",
+          "found": 10,
+          "of": 10
+        },
+        {
+          "type": "qty_mismatch",
+          "check": "item_qty",
+          "found": 10,
+          "of": 10
+        },
+        {
+          "type": "buyer_different",
+          "check": "party_buyer",
+          "found": 10,
+          "of": 10
+        },
+        {
+          "type": "buyer_typo",
+          "check": "party_buyer",
+          "found": 10,
+          "of": 10
+        },
+        {
+          "type": "seller_different",
+          "check": "party_seller",
+          "found": 10,
+          "of": 10
+        },
+        {
+          "type": "date_order_wrong",
+          "check": "date_order",
+          "found": 10,
+          "of": 10
+        },
+        {
+          "type": "hs_mismatch",
+          "check": "hs_match",
+          "found": 10,
+          "of": 10
+        },
+        {
+          "type": "hs_bad_format",
+          "check": "hs_format",
+          "found": 10,
+          "of": 10
+        },
+        {
+          "type": "reference_mismatch",
+          "check": "reference",
+          "found": 10,
+          "of": 10
+        },
+        {
+          "type": "net_gt_gross",
+          "check": "net_le_gross",
+          "found": 10,
+          "of": 10
+        }
+      ]
+    },
+    "clean_sets": {
+      "false_positive_sets": 0,
+      "of": 60
+    },
+    "multi_error": {
+      "found": 90,
+      "of": 90
+    },
+    "unexpected_findings_in_error_sets": {
+      "findings": 0,
+      "sets": 170
+    },
+    "false_findings_by_check": {},
+    "skipped_on_clean_sets": {
+      "line_totals": 0,
+      "invoice_sum": 0,
+      "gross_weight": 0,
+      "net_weight": 0,
+      "packages": 0,
+      "item_qty": 0,
+      "party_seller": 0,
+      "party_buyer": 0,
+      "date_order": 0,
+      "hs_format": 0,
+      "hs_match": 0,
+      "reference": 0,
+      "net_le_gross": 0
+    }
   },
-  "clean_sets": {
-    "false_positive_sets": 0,
-    "of": 60
-  },
-  "multi_error": {
-    "found": 90,
-    "of": 90
+  "dirty": {
+    "single_error": {
+      "found": 31,
+      "of": 140,
+      "types": [
+        {
+          "type": "line_total_wrong",
+          "check": "line_totals",
+          "found": 3,
+          "of": 10
+        },
+        {
+          "type": "invoice_sum_wrong",
+          "check": "invoice_sum",
+          "found": 2,
+          "of": 10
+        },
+        {
+          "type": "gross_weight_mismatch",
+          "check": "gross_weight",
+          "found": 2,
+          "of": 10
+        },
+        {
+          "type": "net_weight_mismatch",
+          "check": "net_weight",
+          "found": 2,
+          "of": 10
+        },
+        {
+          "type": "packages_mismatch",
+          "check": "packages",
+          "found": 0,
+          "of": 10
+        },
+        {
+          "type": "qty_mismatch",
+          "check": "item_qty",
+          "found": 1,
+          "of": 10
+        },
+        {
+          "type": "buyer_different",
+          "check": "party_buyer",
+          "found": 0,
+          "of": 10
+        },
+        {
+          "type": "buyer_typo",
+          "check": "party_buyer",
+          "found": 6,
+          "of": 10
+        },
+        {
+          "type": "seller_different",
+          "check": "party_seller",
+          "found": 7,
+          "of": 10
+        },
+        {
+          "type": "date_order_wrong",
+          "check": "date_order",
+          "found": 0,
+          "of": 10
+        },
+        {
+          "type": "hs_mismatch",
+          "check": "hs_match",
+          "found": 0,
+          "of": 10
+        },
+        {
+          "type": "hs_bad_format",
+          "check": "hs_format",
+          "found": 3,
+          "of": 10
+        },
+        {
+          "type": "reference_mismatch",
+          "check": "reference",
+          "found": 0,
+          "of": 10
+        },
+        {
+          "type": "net_gt_gross",
+          "check": "net_le_gross",
+          "found": 5,
+          "of": 10
+        }
+      ]
+    },
+    "clean_sets": {
+      "false_positive_sets": 2,
+      "of": 60
+    },
+    "multi_error": {
+      "found": 12,
+      "of": 90
+    },
+    "unexpected_findings_in_error_sets": {
+      "findings": 18,
+      "sets": 170
+    },
+    "false_findings_by_check": {
+      "gross_weight": 10,
+      "net_weight": 10,
+      "packages": 1
+    },
+    "skipped_on_clean_sets": {
+      "line_totals": 37,
+      "invoice_sum": 38,
+      "gross_weight": 47,
+      "net_weight": 48,
+      "packages": 43,
+      "item_qty": 50,
+      "party_seller": 33,
+      "party_buyer": 33,
+      "date_order": 60,
+      "hs_format": 23,
+      "hs_match": 60,
+      "reference": 55,
+      "net_le_gross": 18
+    }
   }
 }

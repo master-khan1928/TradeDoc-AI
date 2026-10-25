@@ -105,6 +105,15 @@ h2{font-size:1.25rem;font-weight:500;letter-spacing:-.02em;margin-bottom:12px}
 .letter{white-space:pre-wrap;padding:14px;border-radius:12px;background:rgba(0,0,0,.35);border:1px solid var(--line);font-size:.875rem;line-height:1.6;max-height:340px;overflow:auto}
 .note{font-size:.8125rem;color:var(--fg3)}
 .warn{padding:10px 14px;border-radius:12px;background:rgba(245,179,1,.08);border:1px solid rgba(245,179,1,.35);color:#ffd36a;font-size:.875rem}
+.drop{margin-top:16px;padding:18px;border-radius:14px;border:1.5px dashed var(--line2);background:rgba(0,0,0,.2);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;transition:border-color .2s,background .2s}
+.drop.over,.doc.over textarea{border-color:var(--teal);background:rgba(47,214,195,.07)}
+.drop p{color:var(--fg2);font-size:.875rem}
+.status{min-height:1.2em;font-size:.8125rem;color:var(--fg3);margin-top:6px;overflow-wrap:anywhere}
+.status.bad{color:#ffb3ba}
+.status.photo{color:#ffd36a}
+.doc .tools{display:flex;gap:8px;align-items:center}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.ev .ph{color:#ffd36a;font-size:.75rem;flex-basis:100%}
 footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;border-top:1px solid var(--line);color:var(--fg3);font-size:.8125rem;display:grid;gap:8px}
 [hidden]{display:none!important}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;animation-iteration-count:1!important;transition-duration:1ms!important}.orb{animation:none!important}}
@@ -133,10 +142,17 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
       <h2 id="packTitle" style="margin:0" data-t="pack"></h2>
       <div class="row" id="samples"></div>
     </div>
+    <div class="drop" id="drop">
+      <p><span data-t="drop_text"></span><br><span class="note" data-t="drop_note"></span></p>
+      <button class="btn ghost sm" type="button" id="pickAll" data-t="pick_files"></button>
+      <input type="file" id="fileAll" class="sr" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.txt,application/pdf,image/jpeg,image/png,image/webp,text/plain" tabindex="-1" aria-hidden="true">
+      <div class="status" id="dropStatus" role="status" aria-live="polite" style="flex-basis:100%;margin:0"></div>
+    </div>
     <div class="docs">
-      <div class="doc"><label for="t-invoice"><span data-t="d_invoice"></span><span class="badge" data-t="synthetic"></span></label><textarea id="t-invoice" spellcheck="false"></textarea></div>
-      <div class="doc"><label for="t-packing"><span data-t="d_packing"></span><span class="badge" data-t="synthetic"></span></label><textarea id="t-packing" spellcheck="false"></textarea></div>
-      <div class="doc"><label for="t-cmr"><span>CMR</span><span class="badge" data-t="synthetic"></span></label><textarea id="t-cmr" spellcheck="false"></textarea></div>
+      <div class="doc" data-doc="invoice"><label for="t-invoice"><span data-t="d_invoice"></span><span class="tools"><span class="badge" data-src="invoice" data-t="synthetic"></span><button class="btn ghost sm" type="button" data-pick="invoice" data-t="pick_one"></button></span></label><textarea id="t-invoice" spellcheck="false"></textarea><p class="status" id="s-invoice" role="status" aria-live="polite"></p></div>
+      <div class="doc" data-doc="packing"><label for="t-packing"><span data-t="d_packing"></span><span class="tools"><span class="badge" data-src="packing" data-t="synthetic"></span><button class="btn ghost sm" type="button" data-pick="packing" data-t="pick_one"></button></span></label><textarea id="t-packing" spellcheck="false"></textarea><p class="status" id="s-packing" role="status" aria-live="polite"></p></div>
+      <div class="doc" data-doc="cmr"><label for="t-cmr"><span>CMR</span><span class="tools"><span class="badge" data-src="cmr" data-t="synthetic"></span><button class="btn ghost sm" type="button" data-pick="cmr" data-t="pick_one"></button></span></label><textarea id="t-cmr" spellcheck="false"></textarea><p class="status" id="s-cmr" role="status" aria-live="polite"></p></div>
+      <input type="file" id="fileOne" class="sr" accept=".pdf,.jpg,.jpeg,.png,.webp,.txt,application/pdf,image/jpeg,image/png,image/webp,text/plain" tabindex="-1" aria-hidden="true">
     </div>
     <div class="row" style="margin-top:16px">
       <button class="btn primary" id="run" data-t="run"></button>
@@ -197,9 +213,23 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
       demo_label:"демо-чтение (MOCK)", meta_label:"чтение: Muse Spark",
       ai_down:"ИИ недоступен: документы прочитаны демо-разбором по шаблону.",
       disclaimer:"TradeDoc AI: справка и черновики, не таможенная консультация. Все документы в примерах синтетические, компании вымышленные. Документы не сохраняются.",
-      reading_note:"Режим MOCK читает документы по шаблону и не использует ИИ. Чтение PDF и фото моделью Muse Spark подключается ключом META_API_KEY.",
+      reading_note:"Режим MOCK читает текст по шаблону «Метка: значение» и не использует ИИ. Текстовый слой PDF извлекает код, без ИИ. Фото и сканы читает только модель Muse Spark в режиме META.",
       sev_high:"высокая", sev_medium:"средняя", demo:"демо", loading:"Проверяю…", err:"Не удалось проверить. Попробуйте ещё раз.", page:"стр.",
       sample_btn:"Пример: ",
+      drop_text:"Перетащите сюда PDF, фото или текстовые файлы.", drop_note:"До 1,5 МБ на файл. Тип документа определим по содержимому. Файлы не сохраняются.",
+      pick_files:"Выбрать файлы", pick_one:"Файл", own_file:"ваш файл",
+      reading:"Читаю файл…", st_pdf:"Из PDF: {name}, страниц: {pages}. Текст извлечён кодом, без ИИ.", st_text:"Из файла {name}.",
+      st_photo:"С фото: {name}. Прочитано моделью, подтвердите значения вручную.", st_dropped:"Отброшено полей без цитаты: {n}.",
+      st_edited:"Текст изменён вручную после загрузки.", st_placed:"{name}: определён как «{doc}».",
+      unknown_type:"{name}: не удалось определить тип документа. Загрузите его кнопкой «Файл» в нужной колонке.",
+      photo_tag:"прочитано с фото, подтвердите вручную",
+      e_file_too_large:"Файл больше 1,5 МБ. Сожмите его или загрузите по страницам.",
+      e_unsupported_format:"Этот формат не поддерживается. Подходят PDF, JPG, PNG, WEBP и TXT.",
+      e_photo_needs_meta:"Для чтения фото нужен режим META (ключ Meta). В демо-режиме загрузите PDF с текстовым слоем или текст.",
+      e_pdf_no_text:"В PDF нет текстового слоя (похоже на скан). Загрузите страницы как фото: их читает модель в режиме META.",
+      e_pdf_unreadable:"PDF не читается: файл повреждён или защищён паролем.", e_pdf_timeout:"PDF читается слишком долго. Попробуйте файл поменьше.",
+      e_doc_too_long:"Документ длиннее 20 000 символов.", e_empty_file:"Файл пустой.",
+      e_ai_unavailable:"Модель не смогла прочитать изображение. Попробуйте ещё раз или загрузите PDF.", e_other:"Не удалось прочитать файл.",
     },
     en: {
       eyebrow:"For freight forwarders and small exporters in Central Asia", h1a:"Your cargo crosses the border", h1b:"on the first try.",
@@ -215,15 +245,30 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
       demo_label:"demo reading (MOCK)", meta_label:"reading: Muse Spark",
       ai_down:"AI unavailable: documents were read by the template-based demo parser.",
       disclaimer:"TradeDoc AI: reference and drafts, not customs advice. All example documents are synthetic and the companies are fictional. Documents are not stored.",
-      reading_note:"MOCK mode reads documents by template and does not use AI. Reading PDFs and photos with Muse Spark is enabled with META_API_KEY.",
+      reading_note:"MOCK mode reads text by a \"Label: value\" template and does not use AI. The PDF text layer is extracted by code, without AI. Photos and scans are read only by the Muse Spark model in META mode.",
       sev_high:"high", sev_medium:"medium", demo:"demo", loading:"Checking…", err:"Could not check. Please try again.", page:"p.",
       sample_btn:"Sample: ",
+      drop_text:"Drop PDF, photo or text files here.", drop_note:"Up to 1.5 MB per file. We detect the document type from its content. Files are not stored.",
+      pick_files:"Choose files", pick_one:"File", own_file:"your file",
+      reading:"Reading the file…", st_pdf:"From PDF: {name}, pages: {pages}. Text extracted by code, without AI.", st_text:"From file {name}.",
+      st_photo:"From photo: {name}. Read by the model, confirm the values by hand.", st_dropped:"Fields dropped for lack of a quote: {n}.",
+      st_edited:"Text edited by hand after upload.", st_placed:"{name}: detected as \"{doc}\".",
+      unknown_type:"{name}: could not detect the document type. Upload it with the \"File\" button in the right column.",
+      photo_tag:"read from a photo, confirm by hand",
+      e_file_too_large:"The file is larger than 1.5 MB. Compress it or upload it page by page.",
+      e_unsupported_format:"This format is not supported. Use PDF, JPG, PNG, WEBP or TXT.",
+      e_photo_needs_meta:"Reading photos needs META mode (a Meta key). In demo mode upload a PDF with a text layer or a text file.",
+      e_pdf_no_text:"The PDF has no text layer (looks like a scan). Upload the pages as photos: the model reads them in META mode.",
+      e_pdf_unreadable:"The PDF cannot be read: it is damaged or password-protected.", e_pdf_timeout:"The PDF takes too long to read. Try a smaller file.",
+      e_doc_too_long:"The document is longer than 20,000 characters.", e_empty_file:"The file is empty.",
+      e_ai_unavailable:"The model could not read the image. Try again or upload a PDF.", e_other:"Could not read the file.",
     },
   };
   const DOCN = { ru: { invoice: "Инвойс", packing: "Упаковочный лист", cmr: "CMR" }, en: { invoice: "Invoice", packing: "Packing list", cmr: "CMR" } };
   const $ = (s) => document.querySelector(s);
   const ids = ["invoice", "packing", "cmr"];
-  let lang = "ru", samples = [], last = null, prevIds = null, mode = "mock";
+  let lang = "ru", samples = [], last = null, prevIds = null, mode = "mock", maxBytes = 1536000;
+  const sources = {};
   try { lang = localStorage.getItem("td:lang") || "ru"; } catch {}
   if (!T[lang]) lang = "ru";
 
@@ -237,6 +282,7 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
     $("#letterLang").value = lang;
     $("#modeBadge").textContent = mode === "meta" ? t("meta_label") : t("demo_label");
     renderSamples();
+    ids.forEach(renderSource);
     if (last) renderResult(last, true);
   }
 
@@ -249,8 +295,58 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
       box.append(b);
     }
   }
-  function fill(s) { for (const d of s.docs) $("#t-" + d.type).value = d.text; }
-  const getDocs = () => ids.map((id) => ({ type: id, text: $("#t-" + id).value })).filter((d) => d.text.trim());
+  function fill(s) {
+    for (const id of ids) { delete sources[id]; $("#t-" + id).value = ""; }
+    for (const d of s.docs) $("#t-" + d.type).value = d.text;
+    $("#dropStatus").textContent = ""; ids.forEach(renderSource);
+  }
+  // Что прочитано из загруженного файла. Только в памяти страницы: на сервере ничего не хранится.
+  // Если текст поправили руками, он больше не «из PDF/фото», и разбор фото не отправляется.
+  function getDocs() {
+    return ids.map((id) => {
+      const d = { type: id, text: $("#t-" + id).value }, s = sources[id];
+      if (s && s.text === d.text) { d.origin = s.origin; if (s.extraction) d.extraction = s.extraction; }
+      return d;
+    }).filter((d) => d.text.trim());
+  }
+
+  const fmt = (k, vars) => t(k).replace(/\{(\w+)\}/g, (_, v) => String(vars[v] ?? ""));
+  function renderSource(id) {
+    const s = sources[id], st = $("#s-" + id), badge = document.querySelector(`[data-src="${id}"]`);
+    badge.textContent = s ? s.name : t("synthetic");
+    badge.title = s ? t("own_file") : "";
+    st.className = "status"; st.textContent = "";
+    if (!s) return;
+    if (s.error) { st.classList.add("bad"); st.textContent = T[lang]["e_" + s.error] ?? t("e_other"); return; }
+    if (s.text !== $("#t-" + id).value) { st.textContent = t("st_edited"); return; }
+    st.textContent = fmt(s.kind === "pdf" ? "st_pdf" : s.kind === "photo" ? "st_photo" : "st_text", s) + (s.dropped ? " " + fmt("st_dropped", { n: s.dropped }) : "");
+    if (s.kind === "photo") st.classList.add("photo");
+  }
+
+  async function upload(file, type) {
+    const say = (text, bad) => { const p = el("div", null, text); if (bad) p.style.color = "#ffb3ba"; $("#dropStatus").append(p); };
+    const fail = (code) => { if (type) { sources[type] = { name: file.name, error: code }; renderSource(type); } else say(`${file.name}: ${T[lang]["e_" + code] ?? t("e_other")}`, true); };
+    if (file.size > maxBytes) return fail("file_too_large");
+    const st = type ? $("#s-" + type) : $("#dropStatus");
+    if (type) { st.className = "status"; st.textContent = t("reading"); }
+    let r;
+    try {
+      const res = await fetch("/api/read" + (type ? "?type=" + type : ""), { method: "POST", headers: { "content-type": "application/octet-stream" }, body: file });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) return fail(body.code || (res.status === 413 ? "file_too_large" : "other"));
+      r = body;
+    } catch { return fail("other"); }
+    const target = type || r.type;
+    if (!target) return say(fmt("unknown_type", { name: file.name }), true);
+    $("#t-" + target).value = r.text;
+    sources[target] = { name: file.name, kind: r.kind, origin: r.origin, pages: r.pages, text: r.text, extraction: r.extraction, dropped: r.dropped?.length || 0 };
+    renderSource(target);
+    if (!type) say(fmt("st_placed", { name: file.name, doc: DOCN[lang][target] }));
+  }
+  async function uploadMany(files, type) {
+    if (!type) $("#dropStatus").textContent = "";
+    for (const f of files) await upload(f, type); // по одному файлу на запрос: лимит тела запроса на хостингах
+  }
 
   function selectQuote(doc, quote) {
     const ta = $("#t-" + doc); if (!ta) return;
@@ -291,6 +387,7 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
       for (const e of f.evidence) {
         const b = el("button", "ev"); b.type = "button";
         b.append(el("span", null, `${DOCN[lang][e.doc] ?? e.doc} · ${t("page")} ${e.page}`), el("code", null, e.quote));
+        if (e.origin === "photo") b.append(el("span", "ph", t("photo_tag")));
         b.addEventListener("click", () => selectQuote(e.doc, e.quote));
         card.append(b);
       }
@@ -337,13 +434,35 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
 
   document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => { lang = b.dataset.lang; try { localStorage.setItem("td:lang", lang); } catch {} applyLang(); }));
   $("#run").addEventListener("click", run);
+
+  // файлы: общая зона (тип по содержимому) и кнопка/перетаскивание в колонку (тип задан колонкой)
+  let pickType = null;
+  $("#pickAll").addEventListener("click", () => $("#fileAll").click());
+  $("#fileAll").addEventListener("change", (e) => { uploadMany([...e.target.files], null); e.target.value = ""; });
+  document.querySelectorAll("[data-pick]").forEach((b) => b.addEventListener("click", () => { pickType = b.dataset.pick; $("#fileOne").click(); }));
+  $("#fileOne").addEventListener("change", (e) => { const f = e.target.files[0]; e.target.value = ""; if (f && pickType) upload(f, pickType); });
+  function dropTarget(node, type) {
+    node.addEventListener("dragover", (e) => { e.preventDefault(); e.stopPropagation(); node.classList.add("over"); });
+    node.addEventListener("dragleave", () => node.classList.remove("over"));
+    node.addEventListener("drop", (e) => {
+      e.preventDefault(); e.stopPropagation(); node.classList.remove("over");
+      const files = [...(e.dataTransfer?.files ?? [])];
+      if (files.length) uploadMany(type ? files.slice(0, 1) : files, type);
+    });
+  }
+  dropTarget($("#drop"), null);
+  document.querySelectorAll("[data-doc]").forEach((d) => dropTarget(d, d.dataset.doc));
+  // файл, брошенный мимо зоны, браузер не должен открывать вместо страницы
+  window.addEventListener("dragover", (e) => e.preventDefault());
+  window.addEventListener("drop", (e) => e.preventDefault());
+  ids.forEach((id) => $("#t-" + id).addEventListener("input", () => renderSource(id)));
   $("#mkLetter").addEventListener("click", mkLetter);
   $("#copyLetter").addEventListener("click", async () => {
     try { await navigator.clipboard.writeText($("#letter").textContent); const b = $("#copyLetter"); b.textContent = t("copied"); setTimeout(() => { b.textContent = t("copy"); }, 1500); } catch {}
   });
 
   (async () => {
-    try { mode = (await (await fetch("/api/config")).json()).aiMode; } catch {}
+    try { const c = await (await fetch("/api/config")).json(); mode = c.aiMode; maxBytes = c.maxFileBytes || maxBytes; } catch {}
     try { samples = await (await fetch("/api/samples")).json(); } catch {}
     applyLang();
     if (samples[1]) fill(samples[1]);

@@ -9,5 +9,10 @@
     "test": "node --test \"test/*.test.js\"",
     "bench": "node scripts/bench.mjs"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "unpdf": "1.8.1"
+  }
 }

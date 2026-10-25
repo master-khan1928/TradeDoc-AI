@@ -70,7 +70,7 @@ test("сервер: маршруты, лимиты, статика", async () =>
     assert.equal(ok.findings.length, 0);
     const bad = await post(base, "/api/check", { docs: [{ type: "passport", text: "x" }] });
     assert.equal(bad.status, 400);
-    const big = await post(base, "/api/check", { docs: [{ type: "invoice", text: "x".repeat(250_000) }] });
+    const big = await post(base, "/api/check", { docs: [{ type: "invoice", text: "x".repeat(450_000) }] });
     assert.equal(big.status, 413);
 
     const four = samples().find((s) => s.id === "four");

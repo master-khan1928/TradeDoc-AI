@@ -1,0 +1,101 @@
+{
+  "note": "Synthetic documents, MOCK reading. Measures the comparison logic only, not AI reading quality.",
+  "single_error": {
+    "found": 140,
+    "of": 140,
+    "types": [
+      {
+        "type": "line_total_wrong",
+        "check": "line_totals",
+        "found": 10,
+        "of": 10
+      },
+      {
+        "type": "invoice_sum_wrong",
+        "check": "invoice_sum",
+        "found": 10,
+        "of": 10
+      },
+      {
+        "type": "gross_weight_mismatch",
+        "check": "gross_weight",
+        "found": 10,
+        "of": 10
+      },
+      {
+        "type": "net_weight_mismatch",
+        "check": "net_weight",
+        "found": 10,
+        "of": 10
+      },
+      {
+        "type": "packages_mismatch",
+        "check": "packages",
+        "found": 10,
+        "of": 10
+      },
+      {
+        "type": "qty_mismatch",
+        "check": "item_qty",
+        "found": 10,
+        "of": 10
+      },
+      {
+        "type": "buyer_different",
+        "check": "party_buyer",
+        "found": 10,
+        "of": 10
+      },
+      {
+        "type": "buyer_typo",
+        "check": "party_buyer",
+        "found": 10,
+        "of": 10
+      },
+      {
+        "type": "seller_different",
+        "check": "party_seller",
+        "found": 10,
+        "of": 10
+      },
+      {
+        "type": "date_order_wrong",
+        "check": "date_order",
+        "found": 10,
+        "of": 10
+      },
+      {
+        "type": "hs_mismatch",
+        "check": "hs_match",
+        "found": 10,
+        "of": 10
+      },
+      {
+        "type": "hs_bad_format",
+        "check": "hs_format",
+        "found": 10,
+        "of": 10
+      },
+      {
+        "type": "reference_mismatch",
+        "check": "reference",
+        "found": 10,
+        "of": 10
+      },
+      {
+        "type": "net_gt_gross",
+        "check": "net_le_gross",
+        "found": 10,
+        "of": 10
+      }
+    ]
+  },
+  "clean_sets": {
+    "false_positive_sets": 0,
+    "of": 60
+  },
+  "multi_error": {
+    "found": 90,
+    "of": 90
+  }
+}

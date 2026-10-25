@@ -1,0 +1,13 @@
+{
+  "name": "tradedoc-ai",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "TradeDoc AI: check a trade document pack before the truck leaves for the border.",
+  "scripts": {
+    "start": "node scripts/server.mjs",
+    "test": "node --test \"test/*.test.js\"",
+    "bench": "node scripts/bench.mjs"
+  },
+  "engines": { "node": ">=20" }
+}

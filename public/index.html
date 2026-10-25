@@ -115,6 +115,34 @@ h2{font-size:1.25rem;font-weight:500;letter-spacing:-.02em;margin-bottom:12px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .ev .ph{color:#ffd36a;font-size:.75rem;flex-basis:100%}
 footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;border-top:1px solid var(--line);color:var(--fg3);font-size:.8125rem;display:grid;gap:8px}
+.caseform{display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin-top:14px}
+.caseform label{display:grid;gap:4px;font-size:.8125rem;color:var(--fg2)}
+.caseform input{min-height:40px;padding:6px 12px;border-radius:12px;background:rgba(0,0,0,.35);border:1px solid var(--line);color:var(--fg);font:inherit;color-scheme:dark}
+.caseform input:focus{border-color:var(--teal);outline:none}
+select option{color:#000;background:#fff}
+.cols2{display:grid;gap:16px;margin-top:16px}
+@media(min-width:900px){.cols2{grid-template-columns:1fr 1fr}}
+h3.sub{font-size:.875rem;font-weight:500;color:var(--fg2);margin-bottom:8px}
+.vrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.8125rem;color:var(--fg2)}
+.vrow b{font-weight:500;color:var(--fg);min-width:9ch}
+.vchip{min-height:32px;padding:0 10px;border-radius:999px;border:1px solid var(--line);background:var(--glass);font-size:.75rem}
+.vchip[aria-current=true]{border-color:var(--teal);color:var(--teal)}
+.hist{margin:0;padding-left:20px;display:grid;gap:8px;font-size:.8125rem;color:var(--fg2)}
+.hist .ok{color:var(--green)} .hist .bad{color:#ffb3ba}
+.diffbox{margin-top:14px;padding:12px 14px;border-radius:12px;background:rgba(0,0,0,.35);border:1px solid var(--line);font:400 .8125rem/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;max-height:320px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}
+.diffbox .add{color:var(--green)} .diffbox .del{color:#ffb3ba;text-decoration:line-through}
+#printReport{display:none}
+@media print{
+  @page{margin:16mm}
+  html,body{background:#fff!important;color:#000!important}
+  body>*:not(#printReport){display:none!important}
+  #printReport{display:block!important;font:10.5pt/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#000}
+  #printReport h1{font-size:16pt;margin:0 0 6pt}
+  #printReport h2{font-size:12pt;margin:12pt 0 4pt;border-bottom:1px solid #999;padding-bottom:2pt}
+  #printReport .pf{break-inside:avoid;margin:6pt 0}
+  #printReport .q{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9.5pt;margin-left:10pt}
+  #printReport .muted{color:#444;font-size:9pt}
+}
 [hidden]{display:none!important}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;animation-iteration-count:1!important;transition-duration:1ms!important}.orb{animation:none!important}}
 </style>
@@ -135,6 +163,31 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
     <p class="eyebrow" data-t="eyebrow"></p>
     <h1><span data-t="h1a"></span> <span class="gt" data-t="h1b"></span></h1>
     <p class="lead" data-t="lead"></p>
+  </section>
+
+  <section class="glass panel" id="casePanel" aria-labelledby="caseH" style="margin-bottom:16px">
+    <div class="row" style="justify-content:space-between">
+      <h2 id="caseH" style="margin:0" data-t="case_h"></h2>
+      <div class="row">
+        <label class="sr" for="caseSel" data-t="case_pick"></label>
+        <select id="caseSel" class="btn ghost sm"></select>
+        <button class="btn ghost sm" type="button" id="caseNew" data-t="case_new"></button>
+        <button class="btn ghost sm" type="button" id="caseDel" data-t="case_del"></button>
+        <button class="btn ghost sm" type="button" id="caseWipe" data-t="case_wipe"></button>
+      </div>
+    </div>
+    <div class="caseform">
+      <label><span data-t="case_name"></span><input id="caseName" maxlength="120" autocomplete="off"></label>
+      <label><span data-t="case_dep"></span><input id="caseDep" type="date"></label>
+      <span class="badge" id="caseDue" hidden></span>
+    </div>
+    <div class="cols2">
+      <div><h3 class="sub" data-t="case_docs"></h3><div id="caseDocs" class="stack" style="gap:8px"></div></div>
+      <div><h3 class="sub" data-t="case_hist"></h3><ol id="caseHist" class="hist" reversed></ol></div>
+    </div>
+    <div id="docDiff" class="diffbox" role="region" aria-live="polite" hidden></div>
+    <p class="note" style="margin-top:12px" data-t="case_note"></p>
+    <p class="warn" id="caseWarn" role="alert" hidden></p>
   </section>
 
   <section class="glass panel" aria-labelledby="packTitle">
@@ -169,6 +222,12 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
             <b id="scoreNum">0 / 0</b>
             <div class="meter"><i id="scoreBar"></i></div>
             <div class="chips" id="diff"></div>
+            <div class="row">
+              <label class="sr" for="fixType" data-t="fix_type"></label>
+              <select id="fixType" class="btn ghost sm"><option value="invoice"></option><option value="packing"></option><option value="cmr">CMR</option></select>
+              <button class="btn ghost sm" type="button" id="fixBtn" data-t="fix_btn"></button>
+              <button class="btn ghost sm" type="button" id="printBtn" data-t="print_btn"></button>
+            </div>
           </div>
         </section>
         <section class="glass panel"><h2 data-t="findings"></h2><div class="stack" id="findings"></div></section>
@@ -195,7 +254,10 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
   <p data-t="reading_note"></p>
 </footer>
 
-<script>
+<div id="printReport"></div>
+
+<script type="module">
+import * as CS from "/case-store.js";
 (() => {
   "use strict";
   const T = {
@@ -212,7 +274,7 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
       no_findings:"Расхождений не найдено.", fixed:"Исправлено", added:"Новое", still:"Осталось",
       demo_label:"демо-чтение (MOCK)", meta_label:"чтение: Muse Spark",
       ai_down:"ИИ недоступен: документы прочитаны демо-разбором по шаблону.",
-      disclaimer:"TradeDoc AI: справка и черновики, не таможенная консультация. Все документы в примерах синтетические, компании вымышленные. Документы не сохраняются.",
+      disclaimer:"TradeDoc AI: справка и черновики, не таможенная консультация. Все документы в примерах синтетические, компании вымышленные. Сервер документы не сохраняет; дело груза хранится только в вашем браузере.",
       reading_note:"Режим MOCK читает текст по шаблону «Метка: значение» и не использует ИИ. Текстовый слой PDF извлекает код, без ИИ. Фото и сканы читает только модель Muse Spark в режиме META.",
       sev_high:"высокая", sev_medium:"средняя", demo:"демо", loading:"Проверяю…", err:"Не удалось проверить. Попробуйте ещё раз.", page:"стр.",
       sample_btn:"Пример: ",
@@ -230,6 +292,25 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
       e_pdf_unreadable:"PDF не читается: файл повреждён или защищён паролем.", e_pdf_timeout:"PDF читается слишком долго. Попробуйте файл поменьше.",
       e_doc_too_long:"Документ длиннее 20 000 символов.", e_empty_file:"Файл пустой.",
       e_ai_unavailable:"Модель не смогла прочитать изображение. Попробуйте ещё раз или загрузите PDF.", e_other:"Не удалось прочитать файл.",
+      case_h:"Дело груза", case_pick:"Выбрать дело", case_new:"Новое дело", case_del:"Удалить дело", case_wipe:"Удалить всё",
+      case_name:"Рейс (название, номер машины)", case_dep:"Дата выезда", case_docs:"Версии документов", case_hist:"История проверок",
+      case_note:"Дело хранится только в этом браузере (localStorage): тексты документов, версии и история проверок. На сервер оно не отправляется и там не хранится. «Удалить всё» стирает все дела на этом устройстве.",
+      case_untitled:"Рейс без названия", no_versions:"нет версий", no_checks:"Проверок ещё не было.",
+      due_in:"до выезда дней: {n}", due_today:"выезд сегодня", due_past:"дата выезда прошла",
+      wipe_confirm:"Удалить из этого браузера все дела, версии документов и историю проверок? Отменить нельзя.", del_confirm:"Удалить это дело из браузера?",
+      st_err_quota:"Не удалось сохранить: место в браузере закончилось. Удалите старые дела.",
+      st_err_unavailable:"Браузер не разрешает сохранять данные (например, приватный режим). Проверка работает, но дело не сохранится.",
+      st_err_corrupt:"Сохранённые дела повреждены и не прочитаны. Можно начать заново или нажать «Удалить всё».",
+      st_restored:"Из дела: версия v{v}{namePart}.",
+      h_changed:"изменены", h_fixed:"исправлено", h_added:"новое", h_still:"осталось замечаний", h_first:"первая проверка в деле",
+      diff_first:"{doc} v{v}: первая сохранённая версия, сравнивать не с чем.", diff_head:"{doc}: v{a} → v{b}. Удалено строк: {d}, добавлено: {p}.", diff_same:"Текст не изменился.",
+      fix_type:"Какой документ исправлен", fix_btn:"Загрузить исправленный документ", print_btn:"Печать / PDF",
+      pr_title:"TradeDoc AI: отчёт о проверке комплекта", pr_case:"Дело", pr_dep:"Дата выезда", pr_at:"Проверено", pr_mode:"Чтение",
+      pr_docs:"Документы", pr_result:"Результат", pr_passed:"Пройдено проверок: {p} из {t}. Пропущено: {s}.", pr_changes:"Изменения с прошлой проверки",
+      pr_findings:"Замечания", pr_none:"Расхождений среди проверенного не найдено.", pr_confirm:"Подтвердите вручную",
+      pr_novals:"Отчёт показывает, что и где написано. Верные значения подтверждает сторона, отвечающая за документ: система их не предлагает.",
+      mode_mock:"демо-чтение по шаблону (MOCK), не ИИ", mode_meta:"модель Muse Spark, цитаты проверены кодом",
+      src_pdf:"из PDF", src_photo:"с фото, подтвердите вручную", src_text:"текст", ql:"«", qr:"»",
     },
     en: {
       eyebrow:"For freight forwarders and small exporters in Central Asia", h1a:"Your cargo crosses the border", h1b:"on the first try.",
@@ -244,7 +325,7 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
       no_findings:"No differences found.", fixed:"Fixed", added:"New", still:"Remaining",
       demo_label:"demo reading (MOCK)", meta_label:"reading: Muse Spark",
       ai_down:"AI unavailable: documents were read by the template-based demo parser.",
-      disclaimer:"TradeDoc AI: reference and drafts, not customs advice. All example documents are synthetic and the companies are fictional. Documents are not stored.",
+      disclaimer:"TradeDoc AI: reference and drafts, not customs advice. All example documents are synthetic and the companies are fictional. The server does not store documents; the shipment case is kept only in your browser.",
       reading_note:"MOCK mode reads text by a \"Label: value\" template and does not use AI. The PDF text layer is extracted by code, without AI. Photos and scans are read only by the Muse Spark model in META mode.",
       sev_high:"high", sev_medium:"medium", demo:"demo", loading:"Checking…", err:"Could not check. Please try again.", page:"p.",
       sample_btn:"Sample: ",
@@ -262,6 +343,25 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
       e_pdf_unreadable:"The PDF cannot be read: it is damaged or password-protected.", e_pdf_timeout:"The PDF takes too long to read. Try a smaller file.",
       e_doc_too_long:"The document is longer than 20,000 characters.", e_empty_file:"The file is empty.",
       e_ai_unavailable:"The model could not read the image. Try again or upload a PDF.", e_other:"Could not read the file.",
+      case_h:"Shipment case", case_pick:"Choose a case", case_new:"New case", case_del:"Delete case", case_wipe:"Delete all",
+      case_name:"Trip (name, truck number)", case_dep:"Departure date", case_docs:"Document versions", case_hist:"Check history",
+      case_note:"The case is stored only in this browser (localStorage): document texts, versions and check history. It is not sent to or stored on the server. \"Delete all\" erases every case on this device.",
+      case_untitled:"Untitled trip", no_versions:"no versions", no_checks:"No checks yet.",
+      due_in:"days to departure: {n}", due_today:"departure today", due_past:"departure date has passed",
+      wipe_confirm:"Delete all cases, document versions and check history from this browser? This cannot be undone.", del_confirm:"Delete this case from the browser?",
+      st_err_quota:"Could not save: the browser storage is full. Delete old cases.",
+      st_err_unavailable:"The browser does not allow saving data (for example, private mode). Checks work, but the case will not be saved.",
+      st_err_corrupt:"Saved cases are damaged and could not be read. Start over or press \"Delete all\".",
+      st_restored:"From the case: version v{v}{namePart}.",
+      h_changed:"changed", h_fixed:"fixed", h_added:"new", h_still:"findings remaining", h_first:"first check in the case",
+      diff_first:"{doc} v{v}: first saved version, nothing to compare with.", diff_head:"{doc}: v{a} → v{b}. Lines removed: {d}, added: {p}.", diff_same:"The text did not change.",
+      fix_type:"Which document was corrected", fix_btn:"Upload the corrected document", print_btn:"Print / PDF",
+      pr_title:"TradeDoc AI: document pack check report", pr_case:"Case", pr_dep:"Departure date", pr_at:"Checked", pr_mode:"Reading",
+      pr_docs:"Documents", pr_result:"Result", pr_passed:"Checks passed: {p} of {t}. Skipped: {s}.", pr_changes:"Changes since the previous check",
+      pr_findings:"Findings", pr_none:"No differences found among the checked items.", pr_confirm:"Confirm by hand",
+      pr_novals:"The report shows what is written where. The party responsible for the document confirms the correct values: the system does not suggest them.",
+      mode_mock:"template-based demo reading (MOCK), not AI", mode_meta:"Muse Spark model, quotes verified by code",
+      src_pdf:"from PDF", src_photo:"from photo, confirm by hand", src_text:"text", ql:"“", qr:"”",
     },
   };
   const DOCN = { ru: { invoice: "Инвойс", packing: "Упаковочный лист", cmr: "CMR" }, en: { invoice: "Invoice", packing: "Packing list", cmr: "CMR" } };
@@ -283,6 +383,8 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
     $("#modeBadge").textContent = mode === "meta" ? t("meta_label") : t("demo_label");
     renderSamples();
     ids.forEach(renderSource);
+    const fx = $("#fixType").options; fx[0].textContent = DOCN[lang].invoice; fx[1].textContent = DOCN[lang].packing;
+    renderCase(); showStoreErr();
     if (last) renderResult(last, true);
   }
 
@@ -319,8 +421,9 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
     if (!s) return;
     if (s.error) { st.classList.add("bad"); st.textContent = T[lang]["e_" + s.error] ?? t("e_other"); return; }
     if (s.text !== $("#t-" + id).value) { st.textContent = t("st_edited"); return; }
-    st.textContent = fmt(s.kind === "pdf" ? "st_pdf" : s.kind === "photo" ? "st_photo" : "st_text", s) + (s.dropped ? " " + fmt("st_dropped", { n: s.dropped }) : "");
-    if (s.kind === "photo") st.classList.add("photo");
+    st.textContent = s.kind === "restored" ? fmt("st_restored", { v: s.v, namePart: s.name ? " · " + s.name : "" }) + (s.origin === "photo" ? " " + t("photo_tag") : "")
+      : fmt(s.kind === "pdf" ? "st_pdf" : s.kind === "photo" ? "st_photo" : "st_text", s) + (s.dropped ? " " + fmt("st_dropped", { n: s.dropped }) : "");
+    if (s.origin === "photo") st.classList.add("photo");
   }
 
   async function upload(file, type) {
@@ -421,6 +524,10 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
       cl.append(li);
     }
     $("#letter").hidden = true; $("#copyLetter").hidden = true;
+    // «исправленный документ»: по умолчанию тот, на который чаще всего ссылаются замечания
+    const cited = {}; for (const f of r.findings) for (const e of f.evidence) cited[e.doc] = (cited[e.doc] ?? 0) + 1;
+    const top = Object.entries(cited).sort((a, b) => b[1] - a[1])[0];
+    if (top && !keepDiff) $("#fixType").value = top[0];
     last = r;
   }
 
@@ -429,12 +536,21 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
     const btn = $("#run"); btn.disabled = true; const old = btn.textContent; btn.textContent = t("loading");
     $("#out").hidden = false;
     const fbox = $("#findings"); fbox.textContent = ""; for (let i = 0; i < 3; i++) fbox.append(el("span", "sk"));
+    let r;
     try {
       const res = await fetch("/api/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ docs }) });
       if (!res.ok) throw new Error(String(res.status));
-      renderResult(await res.json(), false);
-    } catch { fbox.textContent = ""; fbox.append(el("p", "warn", t("err"))); }
-    finally { btn.disabled = false; btn.textContent = old; applyBtn(); }
+      r = await res.json();
+    } catch { fbox.textContent = ""; fbox.append(el("p", "warn", t("err"))); btn.disabled = false; applyBtn(); return; }
+    // дело груза: сравнение с прошлой проверкой этого дела, новая версия документа только если текст изменился
+    const c = CS.currentCase(st) ?? CS.newCase(st, { title: $("#caseName").value, departure: $("#caseDep").value });
+    const lc = c.checks.at(-1);
+    prevIds = lc ? new Set(lc.findings.map((f) => f.id)) : null;
+    renderResult(r, false);
+    btn.disabled = false; btn.textContent = old; applyBtn();
+    const vs = CS.addVersions(c, docs.map((d) => ({ ...d, name: d.origin ? sources[d.type]?.name ?? "" : "", kind: d.origin ? sources[d.type]?.kind ?? "" : "" })));
+    CS.recordCheck(c, { ...vs, result: r });
+    persist(); renderCase();
   }
   const applyBtn = () => { $("#run").textContent = t("run"); };
 
@@ -452,8 +568,17 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
   let pickType = null;
   $("#pickAll").addEventListener("click", () => $("#fileAll").click());
   $("#fileAll").addEventListener("change", (e) => { uploadMany([...e.target.files], null); e.target.value = ""; });
-  document.querySelectorAll("[data-pick]").forEach((b) => b.addEventListener("click", () => { pickType = b.dataset.pick; $("#fileOne").click(); }));
-  $("#fileOne").addEventListener("change", (e) => { const f = e.target.files[0]; e.target.value = ""; if (f && pickType) upload(f, pickType); });
+  let autoRun = false; // «Загрузить исправленный документ»: после загрузки сразу проверить заново
+  document.querySelectorAll("[data-pick]").forEach((b) => b.addEventListener("click", () => { pickType = b.dataset.pick; autoRun = false; $("#fileOne").click(); }));
+  $("#fixBtn").addEventListener("click", () => { pickType = $("#fixType").value; autoRun = true; $("#fileOne").click(); });
+  $("#fileOne").addEventListener("change", async (e) => {
+    const f = e.target.files[0]; e.target.value = "";
+    const go = autoRun; autoRun = false;
+    if (!f || !pickType) return;
+    const type = pickType;
+    await upload(f, type);
+    if (go && sources[type] && !sources[type].error) run();
+  });
   function dropTarget(node, type) {
     node.addEventListener("dragover", (e) => { e.preventDefault(); e.stopPropagation(); node.classList.add("over"); });
     node.addEventListener("dragleave", () => node.classList.remove("over"));
@@ -474,11 +599,178 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
     try { await navigator.clipboard.writeText($("#letter").textContent); const b = $("#copyLetter"); b.textContent = t("copied"); setTimeout(() => { b.textContent = t("copy"); }, 1500); } catch {}
   });
 
+  // ---- дело груза: только localStorage этого браузера, на сервер не уходит ----
+  let storage = null;
+  try { storage = window.localStorage; } catch {}
+  let { state: st, error: storeErr } = CS.loadState(storage);
+  if (!storage) storeErr = "unavailable";
+  const locale = () => (lang === "ru" ? "ru-RU" : "en-GB");
+  const fmtTime = (ms) => new Date(ms).toLocaleString(locale(), { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+  const fmtDay = (iso) => (iso ? new Date(iso + "T00:00:00").toLocaleDateString(locale()) : "—");
+  function showStoreErr() { const w = $("#caseWarn"); w.hidden = !storeErr; w.textContent = storeErr ? t("st_err_" + storeErr) : ""; }
+  function persist() {
+    if (!storage) { storeErr = "unavailable"; return showStoreErr(); }
+    const res = CS.saveState(storage, st);
+    storeErr = res.ok ? null : res.error;
+    showStoreErr();
+  }
+
+  function renderCase() {
+    const c = CS.currentCase(st);
+    const sel = $("#caseSel"); sel.textContent = "";
+    if (!st.cases.length) { const o = el("option", null, "—"); o.value = ""; sel.append(o); }
+    for (const x of [...st.cases].sort((a, b) => b.updatedAt - a.updatedAt)) {
+      const o = el("option", null, `${x.title || t("case_untitled")} · ${fmtTime(x.createdAt)}`);
+      o.value = x.id; o.selected = x.id === st.current; sel.append(o);
+    }
+    $("#caseDel").disabled = !c;
+    $("#caseName").value = c?.title ?? "";
+    $("#caseDep").value = c?.departure ?? "";
+    const n = c ? CS.daysUntil(c.departure) : null, due = $("#caseDue");
+    due.hidden = n === null;
+    due.className = "badge " + (n === null ? "" : n < 0 ? "high" : n <= 1 ? "medium" : "ok");
+    due.textContent = n === null ? "" : n > 0 ? fmt("due_in", { n }) : n === 0 ? t("due_today") : t("due_past");
+
+    const docsBox = $("#caseDocs"); docsBox.textContent = "";
+    for (const type of ids) {
+      const row = el("div", "vrow"); row.append(el("b", null, DOCN[lang][type]));
+      const list = c?.docs[type] ?? [];
+      if (!list.length) row.append(el("span", "note", t("no_versions")));
+      list.forEach((ver, i) => {
+        const b = el("button", "vchip", "v" + ver.v); b.type = "button";
+        b.title = fmtTime(ver.at) + (ver.name ? " · " + ver.name : "");
+        b.setAttribute("aria-label", `${DOCN[lang][type]} v${ver.v}, ${b.title}`);
+        if (i === list.length - 1) b.setAttribute("aria-current", "true");
+        b.addEventListener("click", () => showDiff(type, i));
+        row.append(b);
+      });
+      docsBox.append(row);
+    }
+
+    const hist = $("#caseHist"); hist.textContent = "";
+    const checks = c?.checks ?? [];
+    if (!checks.length) { const li = el("li", "note", t("no_checks")); li.style.listStyle = "none"; hist.append(li); }
+    for (let i = checks.length - 1; i >= 0; i--) {
+      const e = checks[i], prev = checks[i - 1];
+      const li = el("li");
+      li.append(el("div", null, `${fmtTime(e.at)} · ${ids.filter((x) => e.versions[x]).map((x) => `${DOCN[lang][x]} v${e.versions[x]}`).join(", ")} · ${e.passed}/${e.total}`));
+      if (prev && e.changed?.length) li.append(el("div", null, `${t("h_changed")}: ${e.changed.map((ch) => `${DOCN[lang][ch.type]} ${ch.from ? `v${ch.from} → ` : ""}v${ch.to}`).join(", ")}`));
+      if (prev) {
+        const d = CS.diffChecks(prev, e);
+        const nm = (id) => [...e.findings, ...prev.findings].find((f) => f.id === id)?.title[lang] ?? id;
+        if (d.fixed.length) li.append(el("div", "ok", `${t("h_fixed")}: ${d.fixed.map(nm).join(", ")}`));
+        if (d.added.length) li.append(el("div", "bad", `${t("h_added")}: ${d.added.map(nm).join(", ")}`));
+        li.append(el("div", null, `${t("h_still")}: ${e.findings.length}`));
+      } else li.append(el("div", null, t("h_first")));
+      hist.append(li);
+    }
+  }
+
+  // что изменилось в документе между версиями: только удалённые и добавленные строки
+  function showDiff(type, i) {
+    const c = CS.currentCase(st); if (!c) return;
+    const list = c.docs[type], cur = list[i], prev = list[i - 1];
+    const box = $("#docDiff"); box.hidden = false; box.textContent = "";
+    if (!prev) { box.append(el("div", null, fmt("diff_first", { doc: DOCN[lang][type], v: cur.v }))); return; }
+    const d = CS.lineDiff(prev.text, cur.text).filter((x) => x.op !== "same");
+    box.append(el("div", null, fmt("diff_head", { doc: DOCN[lang][type], a: prev.v, b: cur.v, d: d.filter((x) => x.op === "del").length, p: d.filter((x) => x.op === "add").length })));
+    if (!d.length) box.append(el("div", null, t("diff_same")));
+    for (const x of d) box.append(el("div", x.op, (x.op === "add" ? "+ " : "− ") + x.line));
+  }
+
+  // последние версии документов дела обратно в поля
+  function loadCaseDocs(c) {
+    for (const type of ids) {
+      const v = c ? CS.latest(c, type) : null;
+      $("#t-" + type).value = v?.text ?? "";
+      if (v && (v.name || v.origin !== "text")) sources[type] = { name: v.name, kind: "restored", v: v.v, origin: v.origin, text: v.text, extraction: v.extraction };
+      else delete sources[type];
+      renderSource(type);
+    }
+    last = null; $("#out").hidden = true; $("#docDiff").hidden = true;
+  }
+
+  $("#caseSel").addEventListener("change", (e) => {
+    if (!e.target.value) return;
+    st.current = e.target.value; persist(); renderCase(); loadCaseDocs(CS.currentCase(st));
+  });
+  $("#caseNew").addEventListener("click", () => { CS.newCase(st, {}); persist(); renderCase(); loadCaseDocs(null); $("#caseName").focus(); });
+  $("#caseDel").addEventListener("click", () => {
+    const c = CS.currentCase(st);
+    if (!c || !confirm(t("del_confirm"))) return;
+    CS.deleteCase(st, c.id); persist(); renderCase(); loadCaseDocs(CS.currentCase(st));
+  });
+  $("#caseWipe").addEventListener("click", () => {
+    if (!confirm(t("wipe_confirm"))) return;
+    if (storage) CS.clearAll(storage);
+    st = CS.emptyState(); storeErr = storage ? null : "unavailable";
+    showStoreErr(); renderCase(); loadCaseDocs(null); $("#dropStatus").textContent = "";
+  });
+  for (const [key, id] of [["title", "#caseName"], ["departure", "#caseDep"]]) {
+    $(id).addEventListener("change", () => {
+      const c = CS.currentCase(st) ?? CS.newCase(st, {});
+      CS.updateCase(c, { [key]: $(id).value }); persist(); renderCase();
+    });
+  }
+
+  // печатный отчёт: замечания с цитатами и страницами; «правильных» значений и расчётов в нём нет
+  function buildPrint() {
+    const r = last; if (!r) return false;
+    const c = CS.currentCase(st), e = c?.checks.at(-1), prev = c?.checks.at(-2);
+    const P = $("#printReport"); P.textContent = "";
+    const add = (tag, cls, text) => { const n = el(tag, cls, text); P.append(n); return n; };
+    const q = (s) => t("ql") + s + t("qr");
+    const quoteLine = (ev) => `${DOCN[lang][ev.doc] ?? ev.doc}, ${t("page")} ${ev.page}: ${q(ev.quote)}${ev.origin === "photo" ? ` (${t("photo_tag")})` : ""}`;
+    add("h1", null, t("pr_title"));
+    add("div", null, `${t("pr_case")}: ${c?.title || t("case_untitled")}`);
+    add("div", null, `${t("pr_dep")}: ${fmtDay(c?.departure)}`);
+    add("div", null, `${t("pr_at")}: ${new Date(e?.at ?? Date.now()).toLocaleString(locale())}`);
+    add("div", null, `${t("pr_mode")}: ${r.mode === "meta" ? t("mode_meta") : t("mode_mock")}`);
+    if (r.aiUnavailable) add("div", null, t("ai_down"));
+    add("h2", null, t("pr_docs"));
+    for (const type of ids) {
+      const v = c ? CS.latest(c, type) : null; if (!v) continue;
+      add("div", null, `${DOCN[lang][type]} v${v.v}${v.name ? " · " + v.name : ""} · ${t("src_" + (v.origin || "text"))}`);
+    }
+    add("h2", null, t("pr_result"));
+    add("div", null, fmt("pr_passed", { p: r.passed, t: r.total, s: r.skipped }));
+    if (prev && e) {
+      const d = CS.diffChecks(prev, e);
+      const nm = (id) => [...e.findings, ...prev.findings].find((f) => f.id === id)?.title[lang] ?? id;
+      add("h2", null, t("pr_changes"));
+      add("div", null, `${t("h_fixed")}: ${d.fixed.map(nm).join(", ") || "—"}`);
+      add("div", null, `${t("h_added")}: ${d.added.map(nm).join(", ") || "—"}`);
+      add("div", null, `${t("h_still")}: ${e.findings.length}`);
+    }
+    add("h2", null, t("pr_findings"));
+    if (!r.findings.length) add("div", null, t("pr_none"));
+    r.findings.forEach((f, i) => {
+      const b = add("div", "pf");
+      b.append(el("div", null, `${i + 1}. ${f.title[lang]} · ${t("sev_" + f.severity)}`));
+      for (const ev of f.evidence) b.append(el("div", "q", quoteLine(ev)));
+    });
+    const unsure = r.checks.filter((x) => x.status === "skip" && x.reasonText);
+    if (unsure.length) {
+      add("h2", null, t("pr_confirm"));
+      for (const x of unsure) {
+        const b = add("div", "pf");
+        b.append(el("div", null, `${x.title[lang]}: ${x.reasonText[lang]}`));
+        for (const ev of x.evidence) b.append(el("div", "q", quoteLine(ev)));
+      }
+    }
+    add("p", "muted", t("pr_novals"));
+    add("p", "muted", t("disclaimer"));
+    return true;
+  }
+  $("#printBtn").addEventListener("click", () => { if (buildPrint()) window.print(); });
+
   (async () => {
     try { const c = await (await fetch("/api/config")).json(); mode = c.aiMode; maxBytes = c.maxFileBytes || maxBytes; } catch {}
     try { samples = await (await fetch("/api/samples")).json(); } catch {}
     applyLang();
-    if (samples[1]) fill(samples[1]);
+    const c = CS.currentCase(st);
+    if (c && ids.some((x) => c.docs[x].length)) loadCaseDocs(c);
+    else if (samples[1]) fill(samples[1]);
   })();
 })();
 </script>

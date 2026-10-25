@@ -10,7 +10,7 @@ import { writeFileSync } from "node:fs";
 import { makeSet, ERROR_TYPES, INJECTORS, rng, expectedChecks } from "../lib/generate.js";
 import { makeDirtySet } from "../lib/generate-dirty.js";
 import { checkPack } from "../lib/pipeline.js";
-import { CHECKS } from "../lib/audit.js";
+import { CHECKS, AMBIGUOUS } from "../lib/audit.js";
 
 const PER_TYPE = 10, CLEAN = 60, MULTI = 30;
 const env = {}; // всегда MOCK
@@ -19,6 +19,7 @@ async function run(make) {
   const types = [];
   let unexpected = 0, errorSets = 0;
   const skipped = Object.fromEntries(Object.keys(CHECKS).map((k) => [k, 0]));
+  const ambiguous = {};
   const falseByCheck = {};
   const score = (r, errors) => {
     const want = expectedChecks(errors);
@@ -42,7 +43,7 @@ async function run(make) {
     const r = await checkPack(make(5000 + i, []).docs, { env });
     if (r.findings.length) cleanFlagged++;
     score(r, []);
-    for (const c of r.checks) if (c.status === "skip") skipped[c.id]++;
+    for (const c of r.checks) if (c.status === "skip") { skipped[c.id]++; if (c.reason === AMBIGUOUS) ambiguous[c.id] = (ambiguous[c.id] ?? 0) + 1; }
   }
 
   let multiFound = 0, multiTotal = 0;
@@ -62,6 +63,7 @@ async function run(make) {
     unexpected_findings_in_error_sets: { findings: unexpected, sets: errorSets },
     false_findings_by_check: falseByCheck,
     skipped_on_clean_sets: skipped, // проверка не смогла выполниться: поле не прочитано или не разобрано
+    skipped_ambiguous_number_on_clean_sets: ambiguous, // из них: число записано неоднозначно («32.500»)
   };
 }
 
@@ -86,4 +88,6 @@ for (const [name, m] of Object.entries({ template: out.template, dirty: out.dirt
   if (fb.length) console.log(`false findings by check     : ${fb.map(([k, v]) => `${k} ${v}`).join(", ")}`);
   const sk = Object.entries(m.skipped_on_clean_sets).filter(([, v]) => v).map(([k, v]) => `${k} ${v}/${CLEAN}`);
   console.log(`checks skipped (clean sets) : ${sk.length ? sk.join(", ") : "none"}`);
+  const am = Object.entries(m.skipped_ambiguous_number_on_clean_sets).map(([k, v]) => `${k} ${v}/${CLEAN}`);
+  console.log(`  of them, ambiguous number : ${am.length ? am.join(", ") : "none"}`);
 }

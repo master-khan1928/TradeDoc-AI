@@ -118,11 +118,12 @@
       "hs_match": 0,
       "reference": 0,
       "net_le_gross": 0
-    }
+    },
+    "skipped_ambiguous_number_on_clean_sets": {}
   },
   "dirty": {
     "single_error": {
-      "found": 31,
+      "found": 29,
       "of": 140,
       "types": [
         {
@@ -140,7 +141,7 @@
         {
           "type": "gross_weight_mismatch",
           "check": "gross_weight",
-          "found": 2,
+          "found": 0,
           "of": 10
         },
         {
@@ -212,7 +213,7 @@
       ]
     },
     "clean_sets": {
-      "false_positive_sets": 2,
+      "false_positive_sets": 0,
       "of": 60
     },
     "multi_error": {
@@ -220,20 +221,16 @@
       "of": 90
     },
     "unexpected_findings_in_error_sets": {
-      "findings": 18,
+      "findings": 0,
       "sets": 170
     },
-    "false_findings_by_check": {
-      "gross_weight": 10,
-      "net_weight": 10,
-      "packages": 1
-    },
+    "false_findings_by_check": {},
     "skipped_on_clean_sets": {
       "line_totals": 37,
       "invoice_sum": 38,
-      "gross_weight": 47,
-      "net_weight": 48,
-      "packages": 43,
+      "gross_weight": 50,
+      "net_weight": 50,
+      "packages": 45,
       "item_qty": 50,
       "party_seller": 33,
       "party_buyer": 33,
@@ -241,7 +238,13 @@
       "hs_format": 23,
       "hs_match": 60,
       "reference": 55,
-      "net_le_gross": 18
+      "net_le_gross": 28
+    },
+    "skipped_ambiguous_number_on_clean_sets": {
+      "gross_weight": 10,
+      "net_weight": 10,
+      "packages": 2,
+      "net_le_gross": 10
     }
   }
 }

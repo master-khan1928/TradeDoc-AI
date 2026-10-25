@@ -222,7 +222,7 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
       st_photo:"С фото: {name}. Прочитано моделью, подтвердите значения вручную.", st_dropped:"Отброшено полей без цитаты: {n}.",
       st_edited:"Текст изменён вручную после загрузки.", st_placed:"{name}: определён как «{doc}».",
       unknown_type:"{name}: не удалось определить тип документа. Загрузите его кнопкой «Файл» в нужной колонке.",
-      photo_tag:"прочитано с фото, подтвердите вручную",
+      photo_tag:"прочитано с фото, подтвердите вручную", confirm_h:"Подтвердите вручную",
       e_file_too_large:"Файл больше 1,5 МБ. Сожмите его или загрузите по страницам.",
       e_unsupported_format:"Этот формат не поддерживается. Подходят PDF, JPG, PNG, WEBP и TXT.",
       e_photo_needs_meta:"Для чтения фото нужен режим META (ключ Meta). В демо-режиме загрузите PDF с текстовым слоем или текст.",
@@ -254,7 +254,7 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
       st_photo:"From photo: {name}. Read by the model, confirm the values by hand.", st_dropped:"Fields dropped for lack of a quote: {n}.",
       st_edited:"Text edited by hand after upload.", st_placed:"{name}: detected as \"{doc}\".",
       unknown_type:"{name}: could not detect the document type. Upload it with the \"File\" button in the right column.",
-      photo_tag:"read from a photo, confirm by hand",
+      photo_tag:"read from a photo, confirm by hand", confirm_h:"Confirm by hand",
       e_file_too_large:"The file is larger than 1.5 MB. Compress it or upload it page by page.",
       e_unsupported_format:"This format is not supported. Use PDF, JPG, PNG, WEBP or TXT.",
       e_photo_needs_meta:"Reading photos needs META mode (a Meta key). In demo mode upload a PDF with a text layer or a text file.",
@@ -356,6 +356,14 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
     ta.scrollIntoView({ block: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   }
 
+  function evButton(e) {
+    const b = el("button", "ev"); b.type = "button";
+    b.append(el("span", null, `${DOCN[lang][e.doc] ?? e.doc} · ${t("page")} ${e.page}`), el("code", null, e.quote));
+    if (e.origin === "photo") b.append(el("span", "ph", t("photo_tag")));
+    b.addEventListener("click", () => selectQuote(e.doc, e.quote));
+    return b;
+  }
+
   function renderResult(r, keepDiff) {
     $("#out").hidden = false;
     $("#modeBadge").textContent = r.mode === "meta" ? t("meta_label") : t("demo_label");
@@ -384,15 +392,20 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
       head.append(el("h3", null, f.title[lang]), el("span", "badge " + f.severity, t("sev_" + f.severity)));
       card.append(head);
       if (f.detail) card.append(el("p", "d", f.detail));
-      for (const e of f.evidence) {
-        const b = el("button", "ev"); b.type = "button";
-        b.append(el("span", null, `${DOCN[lang][e.doc] ?? e.doc} · ${t("page")} ${e.page}`), el("code", null, e.quote));
-        if (e.origin === "photo") b.append(el("span", "ph", t("photo_tag")));
-        b.addEventListener("click", () => selectQuote(e.doc, e.quote));
-        card.append(b);
-      }
+      for (const e of f.evidence) card.append(evButton(e));
       fbox.append(card);
     });
+    // проверки, пропущенные с причиной (неоднозначный формат числа): где написано, без «правильного» значения
+    const unsure = r.checks.filter((c) => c.status === "skip" && c.reasonText);
+    if (unsure.length) {
+      const card = el("article", "f"); card.style.setProperty("--i", r.findings.length);
+      card.append(el("h3", null, t("confirm_h")));
+      for (const c of unsure) {
+        card.append(el("p", "d", `${c.title[lang]}: ${c.reasonText[lang]}`));
+        for (const e of c.evidence) card.append(evButton(e));
+      }
+      fbox.append(card);
+    }
 
     const ibox = $("#inspector"); ibox.textContent = "";
     if (!r.inspector.questions.length) ibox.append(el("p", "note", t("insp_none")));
@@ -404,7 +417,7 @@ footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;b
 
     const cl = $("#checks"); cl.textContent = "";
     for (const c of r.checks) {
-      const li = el("li", c.status); li.append(el("i", null, c.status === "pass" ? "✓" : c.status === "fail" ? "!" : "–"), el("span", null, c.title[lang]));
+      const li = el("li", c.status); li.append(el("i", null, c.status === "pass" ? "✓" : c.status === "fail" ? "!" : c.reasonText ? "?" : "–"), el("span", null, c.title[lang] + (c.reasonText ? ` (${c.reasonText[lang]})` : "")));
       cl.append(li);
     }
     $("#letter").hidden = true; $("#copyLetter").hidden = true;

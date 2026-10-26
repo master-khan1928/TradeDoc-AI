@@ -113,13 +113,13 @@ test("сайт получает вид сбоя: при проверке (aiErro
 });
 
 test("синтетическое изображение: настоящий PNG, текст нарисован", () => {
-  const { png, text, width, height } = renderTextPng(["Invoice No: 1", "Привет"], { scale: 2 });
+  const { png, text, width, height } = renderTextPng(["Invoice No: 1", "Привет «Ёж»", "Қ"], { scale: 2 });
   assert.equal(sniffFormat(png).mime, "image/png");
   assert.equal(png.readUInt32BE(16), width);
   assert.equal(png.readUInt32BE(20), height);
   const idat = png.subarray(png.indexOf("IDAT") + 4, png.indexOf("IEND") - 8);
   assert.equal(inflateSync(idat).length, (width + 1) * height);
-  assert.equal(text, "INVOICE NO: 1\n??????", "кириллицы в шрифте нет: честно рисуется «?»");
+  assert.equal(text, "INVOICE NO: 1\nПРИВЕТ «ЁЖ»\n?", "русская кириллица нарисована; казахской Қ в шрифте нет, честно «?»");
 });
 
 async function probeLog(script, image = false) {

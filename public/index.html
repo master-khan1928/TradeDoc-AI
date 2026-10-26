@@ -274,6 +274,12 @@ import * as CS from "/case-store.js";
       no_findings:"Расхождений не найдено.", fixed:"Исправлено", added:"Новое", still:"Осталось",
       demo_label:"демо-чтение (MOCK)", meta_label:"чтение: Muse Spark",
       ai_down:"ИИ недоступен: документы прочитаны демо-разбором по шаблону.",
+      r_auth:"Причина: ключ не принят или нет доступа к модели (401/403).", r_model:"Причина: неверный идентификатор модели META_MODEL (404).",
+      r_rate:"Причина: превышен лимит запросов (429). Попробуйте через минуту.", r_timeout:"Причина: модель не ответила вовремя.",
+      r_network:"Причина: нет связи с сервером модели.", r_server:"Причина: ошибка на стороне сервиса модели (5xx).",
+      r_bad_response:"Причина: ответ модели не по схеме.", r_bad_request:"Причина: сервис отклонил запрос (400). Возможно, модель не принимает изображения.",
+      e_client_timeout:"Ответ не пришёл вовремя. Попробуйте ещё раз.",
+      json_fb:"запасной режим JSON", json_fb_note:"Сервис модели не принял строгую схему ответа (json_schema). Документы прочитаны в запасном режиме «верни JSON»; цитаты проверены кодом так же.",
       disclaimer:"TradeDoc AI: справка и черновики, не таможенная консультация. Все документы в примерах синтетические, компании вымышленные. Сервер документы не сохраняет; дело груза хранится только в вашем браузере.",
       reading_note:"Режим MOCK читает текст по шаблону «Метка: значение» и не использует ИИ. Текстовый слой PDF извлекает код, без ИИ. Фото и сканы читает только модель Muse Spark в режиме META.",
       sev_high:"высокая", sev_medium:"средняя", demo:"демо", loading:"Проверяю…", err:"Не удалось проверить. Попробуйте ещё раз.", page:"стр.",
@@ -325,6 +331,12 @@ import * as CS from "/case-store.js";
       no_findings:"No differences found.", fixed:"Fixed", added:"New", still:"Remaining",
       demo_label:"demo reading (MOCK)", meta_label:"reading: Muse Spark",
       ai_down:"AI unavailable: documents were read by the template-based demo parser.",
+      r_auth:"Reason: the key was not accepted or there is no access to the model (401/403).", r_model:"Reason: wrong model identifier in META_MODEL (404).",
+      r_rate:"Reason: request limit reached (429). Try again in a minute.", r_timeout:"Reason: the model did not answer in time.",
+      r_network:"Reason: no connection to the model server.", r_server:"Reason: the model service failed (5xx).",
+      r_bad_response:"Reason: the model's answer did not match the schema.", r_bad_request:"Reason: the service rejected the request (400). The model may not accept images.",
+      e_client_timeout:"The answer did not arrive in time. Please try again.",
+      json_fb:"JSON fallback mode", json_fb_note:"The model service did not accept the strict answer schema (json_schema). Documents were read in the \"return JSON\" fallback mode; quotes were verified by code in the same way.",
       disclaimer:"TradeDoc AI: reference and drafts, not customs advice. All example documents are synthetic and the companies are fictional. The server does not store documents; the shipment case is kept only in your browser.",
       reading_note:"MOCK mode reads text by a \"Label: value\" template and does not use AI. The PDF text layer is extracted by code, without AI. Photos and scans are read only by the Muse Spark model in META mode.",
       sev_high:"high", sev_medium:"medium", demo:"demo", loading:"Checking…", err:"Could not check. Please try again.", page:"p.",
@@ -367,7 +379,7 @@ import * as CS from "/case-store.js";
   const DOCN = { ru: { invoice: "Инвойс", packing: "Упаковочный лист", cmr: "CMR" }, en: { invoice: "Invoice", packing: "Packing list", cmr: "CMR" } };
   const $ = (s) => document.querySelector(s);
   const ids = ["invoice", "packing", "cmr"];
-  let lang = "ru", samples = [], last = null, prevIds = null, mode = "mock", maxBytes = 1536000;
+  let lang = "ru", samples = [], last = null, prevIds = null, mode = "mock", jsonFb = false, maxBytes = 1536000;
   const sources = {};
   try { lang = localStorage.getItem("td:lang") || "ru"; } catch {}
   if (!T[lang]) lang = "ru";
@@ -380,7 +392,7 @@ import * as CS from "/case-store.js";
     document.querySelectorAll("[data-t]").forEach((n) => { n.textContent = t(n.dataset.t); });
     document.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
     $("#letterLang").value = lang;
-    $("#modeBadge").textContent = mode === "meta" ? t("meta_label") : t("demo_label");
+    $("#modeBadge").textContent = last ? modeLabel(last.mode, last.jsonFallback) : modeLabel(mode, jsonFb);
     renderSamples();
     ids.forEach(renderSource);
     const fx = $("#fixType").options; fx[0].textContent = DOCN[lang].invoice; fx[1].textContent = DOCN[lang].packing;
@@ -419,26 +431,32 @@ import * as CS from "/case-store.js";
     badge.title = s ? t("own_file") : "";
     st.className = "status"; st.textContent = "";
     if (!s) return;
-    if (s.error) { st.classList.add("bad"); st.textContent = T[lang]["e_" + s.error] ?? t("e_other"); return; }
+    if (s.error) { st.classList.add("bad"); st.textContent = errText(s.error, s.reason); return; }
     if (s.text !== $("#t-" + id).value) { st.textContent = t("st_edited"); return; }
     st.textContent = s.kind === "restored" ? fmt("st_restored", { v: s.v, namePart: s.name ? " · " + s.name : "" }) + (s.origin === "photo" ? " " + t("photo_tag") : "")
       : fmt(s.kind === "pdf" ? "st_pdf" : s.kind === "photo" ? "st_photo" : "st_text", s) + (s.dropped ? " " + fmt("st_dropped", { n: s.dropped }) : "");
     if (s.origin === "photo") st.classList.add("photo");
   }
 
+  // сервер ждёт модель не дольше двух попыток по META_TIMEOUT_MS (25 с); браузер ждёт сервер с запасом
+  const READ_TIMEOUT_MS = 90000, CHECK_TIMEOUT_MS = 120000;
+  const errText = (code, reason) => (T[lang]["e_" + code] ?? t("e_other")) + (reason && T[lang]["r_" + reason] ? " " + t("r_" + reason) : "");
+  const modeLabel = (m, fb) => (m === "meta" ? t("meta_label") + (fb ? " · " + t("json_fb") : "") : t("demo_label"));
+
   async function upload(file, type) {
     const say = (text, bad) => { const p = el("div", null, text); if (bad) p.style.color = "#ffb3ba"; $("#dropStatus").append(p); };
-    const fail = (code) => { if (type) { sources[type] = { name: file.name, error: code }; renderSource(type); } else say(`${file.name}: ${T[lang]["e_" + code] ?? t("e_other")}`, true); };
+    const fail = (code, reason) => { if (type) { sources[type] = { name: file.name, error: code, reason }; renderSource(type); } else say(`${file.name}: ${errText(code, reason)}`, true); };
     if (file.size > maxBytes) return fail("file_too_large");
     const st = type ? $("#s-" + type) : $("#dropStatus");
     if (type) { st.className = "status"; st.textContent = t("reading"); }
     let r;
     try {
-      const res = await fetch("/api/read" + (type ? "?type=" + type : ""), { method: "POST", headers: { "content-type": "application/octet-stream" }, body: file });
+      // фото читает модель: сервер ждёт её не дольше двух попыток, браузер ждёт сервер не дольше READ_TIMEOUT_MS
+      const res = await fetch("/api/read" + (type ? "?type=" + type : ""), { method: "POST", headers: { "content-type": "application/octet-stream" }, body: file, signal: AbortSignal.timeout(READ_TIMEOUT_MS) });
       const body = await res.json().catch(() => ({}));
-      if (!res.ok) return fail(body.code || (res.status === 413 ? "file_too_large" : "other"));
+      if (!res.ok) return fail(body.code || (res.status === 413 ? "file_too_large" : "other"), body.reason);
       r = body;
-    } catch { return fail("other"); }
+    } catch (e) { return fail(e?.name === "TimeoutError" ? "client_timeout" : "other"); }
     const target = type || r.type;
     if (!target) return say(fmt("unknown_type", { name: file.name }), true);
     $("#t-" + target).value = r.text;
@@ -469,14 +487,15 @@ import * as CS from "/case-store.js";
 
   function renderResult(r, keepDiff) {
     $("#out").hidden = false;
-    $("#modeBadge").textContent = r.mode === "meta" ? t("meta_label") : t("demo_label");
+    $("#modeBadge").textContent = modeLabel(r.mode, r.jsonFallback);
     const num = $("#scoreNum"), bar = $("#scoreBar");
     num.textContent = `${r.passed} / ${r.total}`;
     bar.className = r.findings.length ? "bad" : "";
     requestAnimationFrame(() => { bar.style.width = (r.total ? (r.passed / r.total) * 100 : 0) + "%"; });
 
     const diff = $("#diff"); diff.textContent = "";
-    if (r.aiUnavailable) { const w = el("p", "warn", t("ai_down")); diff.append(w); }
+    if (r.aiUnavailable) { const w = el("p", "warn", t("ai_down") + (r.aiError && T[lang]["r_" + r.aiError] ? " " + t("r_" + r.aiError) : "")); diff.append(w); }
+    if (r.jsonFallback) diff.append(el("p", "warn", t("json_fb_note")));
     if (prevIds && !keepDiff) {
       const now = new Set(r.findings.map((f) => f.id));
       const fixed = [...prevIds].filter((x) => !now.has(x)), added = [...now].filter((x) => !prevIds.has(x)), still = [...now].filter((x) => prevIds.has(x));
@@ -538,10 +557,10 @@ import * as CS from "/case-store.js";
     const fbox = $("#findings"); fbox.textContent = ""; for (let i = 0; i < 3; i++) fbox.append(el("span", "sk"));
     let r;
     try {
-      const res = await fetch("/api/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ docs }) });
+      const res = await fetch("/api/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ docs }), signal: AbortSignal.timeout(CHECK_TIMEOUT_MS) });
       if (!res.ok) throw new Error(String(res.status));
       r = await res.json();
-    } catch { fbox.textContent = ""; fbox.append(el("p", "warn", t("err"))); btn.disabled = false; applyBtn(); return; }
+    } catch (e) { fbox.textContent = ""; fbox.append(el("p", "warn", e?.name === "TimeoutError" ? t("e_client_timeout") : t("err"))); btn.disabled = false; applyBtn(); return; }
     // дело груза: сравнение с прошлой проверкой этого дела, новая версия документа только если текст изменился
     const c = CS.currentCase(st) ?? CS.newCase(st, { title: $("#caseName").value, departure: $("#caseDep").value });
     const lc = c.checks.at(-1);
@@ -765,7 +784,7 @@ import * as CS from "/case-store.js";
   $("#printBtn").addEventListener("click", () => { if (buildPrint()) window.print(); });
 
   (async () => {
-    try { const c = await (await fetch("/api/config")).json(); mode = c.aiMode; maxBytes = c.maxFileBytes || maxBytes; } catch {}
+    try { const c = await (await fetch("/api/config")).json(); mode = c.aiMode; jsonFb = !!c.jsonFallback; maxBytes = c.maxFileBytes || maxBytes; } catch {}
     try { samples = await (await fetch("/api/samples")).json(); } catch {}
     applyLang();
     const c = CS.currentCase(st);

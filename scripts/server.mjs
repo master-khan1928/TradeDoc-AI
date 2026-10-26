@@ -6,6 +6,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { dirname, join, normalize, extname } from "node:path";
 import { checkPack, validateDocs } from "../lib/pipeline.js";
 import { aiMode } from "../lib/extract/index.js";
+import { metaConfig, usesJsonFallback } from "../lib/extract/meta.js";
 import { samples } from "../lib/generate.js";
 import { buildLetter } from "../lib/letters.js";
 import { readUpload } from "../lib/upload.js";
@@ -54,7 +55,7 @@ export function createApp() {
     try {
       const url = new URL(req.url, "http://x");
       if (url.pathname === "/healthz") return send(res, 200, "ok", "text/plain");
-      if (url.pathname === "/api/config" && req.method === "GET") return send(res, 200, { aiMode: aiMode(), maxFileBytes: MAX_FILE_BYTES });
+      if (url.pathname === "/api/config" && req.method === "GET") return send(res, 200, { aiMode: aiMode(), jsonFallback: usesJsonFallback(metaConfig()), maxFileBytes: MAX_FILE_BYTES });
       if (url.pathname === "/api/samples" && req.method === "GET") return send(res, 200, samples());
       if (url.pathname === "/api/check" && req.method === "POST") {
         const body = await readBody(req);
@@ -86,7 +87,7 @@ export function createApp() {
         return send(res, 404, { error: "not found" });
       }
     } catch (e) {
-      if (e instanceof InputError) return send(res, e.status, { error: e.message, code: e.code });
+      if (e instanceof InputError) return send(res, e.status, { error: e.message, code: e.code, ...(e.reason ? { reason: e.reason } : {}) });
       send(res, e.code === 413 ? 413 : e.code === 400 ? 400 : 500, { error: e.code === 413 ? "request too large" : e.code === 400 ? "bad request" : "server error" });
     }
   });

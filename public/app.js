@@ -158,6 +158,18 @@ import { mockExtract } from "/shared/mock.js";
   T.kk = {"eyebrow":"Орталық Азиядағы экспедиторлар мен шағын экспорттаушыларға","h1a":"Жүк шекарадан","h1b":"бірінші реттен өтеді.","lead":"Көлік шыққанға дейін құжаттар жиынтығын тексереміз. Сандар мен атауларды код салыстырады, әр ескертудің дәйексөзі мен беті бар. Қате серіктесте болса, дұрыс мәнді растауды сұрайтын хат дайындаймыз. Мәндерді ұсынбаймыз.","pack":"Құжаттар жиынтығы","d_invoice":"Инвойс","d_packing":"Қаптама парағы","synthetic":"синтетика","run":"Жиынтықты тексеру","drop_text":"PDF, фото немесе мәтін файлдарын осында сүйреңіз.","drop_note":"Әр файл 1,5 МБ-қа дейін. Құжат түрін мазмұны бойынша анықтаймыз. Файлдар сақталмайды.","pick_files":"Файлдарды таңдау","pick_one":"Файл","findings":"Ескертулер","all_checks":"Барлық тексерулер","passed_label":"Тексеру нәтижесі","st_found":"сәйкессіздік табылды","st_notfound":"сәйкессіздік табылмады","st_review":"адамның тексеруі қажет","st_nodata":"тексеруге дерек жоқ","consent_text":"Пайдалану шарттары мен құпиялылық саясатын қабылдаймын және деректерді өңдеуге келісім беремін. Тегін модельдің демо режимінде тек синтетикалық құжаттарды жүктеймін.","legal_docs":"Құжаттар (жобалар):","l_TERMS":"Шарттар","l_PRIVACY":"Құпиялылық саясаты","l_CONSENT":"Келісім","l_DISCLAIMER":"Жауапкершіліктен бас тарту","consent_needed":"Құжаттарды жүктеу және тексеру үшін жоғарыдағы келісімді белгілеңіз.","demo_label":"демо оқу (MOCK, ЖИ емес)","ai_label":"оқу: {label} · {model}","free_tag":"тегін тариф","meta_waiting":"Meta қабаты дайын, кілтті күтеміз. Қазіргі режим: {mode}.","demo_banner":"Демо режим: тегін модель {label}. Нақты құжаттарды жүктемеңіз: тегін тарифте провайдер деректерді өз өнімдерін жақсарту үшін пайдалануы мүмкін. Тек синтетикалық құжаттар.","ai_mark_ai":"ЖИ көмегімен дайындалды: {label} · {model}. Салыстыруды код жасады; ескертулерді түпнұсқамен тексеріңіз.","ai_mark_mock":"ЖИ-сіз автоматты түрде дайындалды (үлгі бойынша талдау). Ескертулерді түпнұсқамен тексеріңіз.","disclaimer":"TradeDoc AI: анықтама және жобалар, кедендік кеңес емес. Мысалдардағы құжаттар синтетикалық, компаниялар ойдан шығарылған. Сервер құжаттарды сақтамайды; жүк ісі тек сіздің браузеріңізде сақталады.","disclaimer_short":"Сервис көмекші құрал: кедендік брокер де, заңгер де емес, заң кеңесін бермейді және шекарадан өтуге кепілдік бермейді. ЖИ нәтижелерінде қате болуы мүмкін. Қорытынды құжаттар үшін пайдаланушы жауап береді.","case_wipe":"Менің барлық деректерімді жою","case_h":"Жүк ісі","case_new":"Жаңа іс","case_del":"Істі жою","err":"Тексеру мүмкін болмады. Қайталап көріңіз.","loading":"Тексерудемін…","reading":"Файлды оқудамын…","e_file_too_large":"Файл 1,5 МБ-тан үлкен. Оны сығыңыз немесе беттер бойынша жүктеңіз.","e_unsupported_format":"Бұл формат қолдау көрсетілмейді. PDF, JPG, PNG, WEBP және TXT жарайды.","e_photo_needs_ai":"Фотоны оқу үшін ЖИ режимі қажет: тегін модель немесе Meta. Қазір MOCK: мәтін қабаты бар PDF немесе мәтін жүктеңіз.","e_real_data_suspected":"Құжатта нақты дербес деректер бар сияқты ({markers}). Демо режимде тек синтетикалық құжаттар қабылданады, модельге ештеңе жіберілген жоқ.","e_pdf_active_content":"PDF белсенді мазмұнды (скрипттер, тіркемелер немесе формалар) қамтиды және қабылданбайды.","e_pdf_too_many_pages":"PDF-те 20-дан көп бет бар. Тек қажетті беттерді жүктеңіз.","e_too_many_requests":"Сұраулар тым көп. Бір минут күтіп, қайталаңыз.","e_other":"Файлды оқу мүмкін болмады.","r_rate_free":"Себебі: тегін модельдің лимиті таусылды. Бір минуттан кейін қайталаңыз.","kk_note":"Қазақша аударма ішінара және ана тілінде сөйлейтін адамның тексеруін қажет етеді."};
   const NEW_I18N = {"ru":{"tab_documents":"Документы","tab_check":"Проверка","tab_case":"Дело груза","tab_report":"Отчёт","consent_short":"Принимаю условия и даю согласие на обработку данных. В демо-режиме бесплатной модели загружаю только синтетические документы.","empty_docs_h":"Документов пока нет","empty_docs_p":"Загрузите PDF, фото или текстовые файлы комплекта (инвойс, упаковочный лист, CMR) либо возьмите демо-комплект из синтетических документов.","load_pack":"Загрузить комплект","demo_pack":"Взять демо-комплект","clear_one":"Очистить","raw_show":"Показать/редактировать исходный текст","raw_hide":"Скрыть исходный текст","raw_label":"Исходный текст документа","uploaded_tag":"загружено","restored_tag":"из дела","kb":"КБ","bytes":"Б","sheet_empty":"Пусто. Загрузите файл или вставьте текст.","sheet_other":"Прочие строки (как в документе)","th_n":"№","th_desc":"Товар","th_qty":"Кол-во","th_unit":"Ед.","th_price":"Цена","th_sum":"Сумма","total_row":"Итого","p_seller":"Продавец / отправитель","p_buyer":"Покупатель / получатель","fn_number":"Номер","fn_reference":"Ссылка на инвойс","fn_date":"Дата","fn_shipment_date":"Дата отгрузки","fn_currency":"Валюта","fn_hs_code":"Код ТН ВЭД","fn_incoterms":"Инкотермс","fn_total":"Итого","fn_gross_weight":"Вес брутто","fn_net_weight":"Вес нетто","fn_packages":"Мест","empty_check_h":"Проверки ещё не было","empty_check_p":"Загрузите документы на вкладке «Документы» и нажмите «Проверить комплект».","go_docs":"Перейти к документам","empty_report_h":"Отчёта пока нет","g_found":"Найдено","g_review":"Нужна проверка человеком","g_ok":"Не найдено","none_review":"Нет пунктов, требующих ручной проверки.","none_ok":"Пока ничего.","date_hint":"Выберите в календаре или введите вручную (формат как в вашем браузере)","report_note":"Печатная версия: замечания с цитатами, без «правильных» значений. Откроется диалог печати браузера, оттуда можно сохранить PDF.","meta_mode":"Режим","meta_time":"Проверено","meta_checks":"Проверок","meta_pack":"Хэш комплекта (SHA-256)","meta_rules":"Каталог правил","meta_app":"Версия","meta_checks_v":"{n} выполнено, {s} пропущено","pr_pack":"Комплект (SHA-256)","jump_hint":"Показать в документе"},"en":{"tab_documents":"Documents","tab_check":"Check","tab_case":"Shipment case","tab_report":"Report","consent_short":"I accept the terms and consent to data processing. In the free-model demo mode I upload synthetic documents only.","empty_docs_h":"No documents yet","empty_docs_p":"Upload PDF, photo or text files of the pack (invoice, packing list, CMR) or take the demo pack of synthetic documents.","load_pack":"Upload a pack","demo_pack":"Use the demo pack","clear_one":"Clear","raw_show":"Show / edit source text","raw_hide":"Hide source text","raw_label":"Source text of the document","uploaded_tag":"uploaded","restored_tag":"from case","kb":"KB","bytes":"B","sheet_empty":"Empty. Upload a file or paste text.","sheet_other":"Other lines (as in the document)","th_n":"No","th_desc":"Goods","th_qty":"Qty","th_unit":"Unit","th_price":"Price","th_sum":"Amount","total_row":"Total","p_seller":"Seller / sender","p_buyer":"Buyer / consignee","fn_number":"Number","fn_reference":"Invoice reference","fn_date":"Date","fn_shipment_date":"Shipment date","fn_currency":"Currency","fn_hs_code":"HS code","fn_incoterms":"Incoterms","fn_total":"Total","fn_gross_weight":"Gross weight","fn_net_weight":"Net weight","fn_packages":"Packages","empty_check_h":"No check yet","empty_check_p":"Upload documents on the \"Documents\" tab and press \"Check the pack\".","go_docs":"Go to documents","empty_report_h":"No report yet","g_found":"Found","g_review":"Needs a human check","g_ok":"Not found","none_review":"Nothing needs a manual check.","none_ok":"Nothing yet.","date_hint":"Pick in the calendar or type it (format as in your browser)","report_note":"Printable version: findings with quotes, without \"correct\" values. The browser print dialog opens; you can save a PDF there.","meta_mode":"Mode","meta_time":"Checked","meta_checks":"Checks","meta_pack":"Pack hash (SHA-256)","meta_rules":"Rules catalog","meta_app":"Version","meta_checks_v":"{n} done, {s} skipped","pr_pack":"Pack (SHA-256)","jump_hint":"Show in the document"},"kk":{"tab_documents":"Құжаттар","tab_check":"Тексеру","tab_case":"Жүк ісі","tab_report":"Есеп","consent_short":"Шарттармен келісемін және деректерді өңдеуге келісім беремін. Тегін модельдің демо режимінде тек синтетикалық құжаттарды жүктеймін.","empty_docs_h":"Құжаттар әзірге жоқ","empty_docs_p":"Жиынтықтың PDF, фото немесе мәтін файлдарын жүктеңіз немесе синтетикалық демо жиынтықты алыңыз.","load_pack":"Жиынтықты жүктеу","demo_pack":"Демо жиынтықты алу","clear_one":"Тазалау","raw_show":"Бастапқы мәтінді көрсету/өңдеу","raw_hide":"Бастапқы мәтінді жасыру","uploaded_tag":"жүктелген","g_found":"Табылды","g_review":"Адамның тексеруі қажет","g_ok":"Табылмады","go_docs":"Құжаттарға өту","empty_check_h":"Тексеру әлі болған жоқ","empty_report_h":"Есеп әлі жоқ"}};
   for (const k of Object.keys(NEW_I18N)) Object.assign(T[k], NEW_I18N[k]);
+  // состояние результата и черновика (аудит 05.11.2026); казахский берёт недостающее из русского
+  const STATE_I18N = {
+    ru: { stale_note: "Документы изменились после проверки: результат устарел. Печать и письмо недоступны до новой проверки.",
+      discarded_note: "Ответ проверки пришёл после смены дела или документов и не применён. Запустите проверку заново.",
+      not_saved: "Результат не сохранён в деле.", lost: "Больше не удалось проверить", h_lost: "больше не удалось проверить",
+      consent_stopped: "Согласие отозвано: загрузка остальных файлов остановлена.", draft_restored: "Восстановлен несохранённый черновик документов этого дела." },
+    en: { stale_note: "The documents changed after the check: the result is out of date. Print and letter are unavailable until a new check.",
+      discarded_note: "The check answer arrived after the case or documents changed and was not applied. Run the check again.",
+      not_saved: "The result was not saved to the case.", lost: "Could no longer be checked", h_lost: "could no longer be checked",
+      consent_stopped: "Consent withdrawn: uploading the remaining files was stopped.", draft_restored: "An unsaved draft of this case's documents was restored." },
+  };
+  for (const k of Object.keys(STATE_I18N)) Object.assign(T[k], STATE_I18N[k]);
   const DOCN = { kk: { invoice: "Инвойс", packing: "Қаптама парағы", cmr: "CMR" }, ru: { invoice: "Инвойс", packing: "Упаковочный лист", cmr: "CMR" }, en: { invoice: "Invoice", packing: "Packing list", cmr: "CMR" } };
   const $ = (s) => document.querySelector(s);
   const ids = ["invoice", "packing", "cmr"];
@@ -169,11 +181,16 @@ import { mockExtract } from "/shared/mock.js";
 
   // казахский переведён не полностью: недостающие строки берутся из русского, а не показываются ключом
   const t = (k) => T[lang][k] ?? T.ru[k] ?? k;
+  // то же правило для текстов результата с сервера ({ ru, en }): на казахском показывается русский, а не пусто
+  const L = (o) => (o ? o[lang] ?? o.ru ?? o.en ?? "" : "");
   function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  // gen растёт при любом изменении документов или дела; ответ проверки применяется, только если gen тот же
+  let gen = 0, running = null, stale = false, lastEntry = null, lastCaseId = null;
 
   function applyLang() {
     document.documentElement.lang = lang;
     document.querySelectorAll("[data-t]").forEach((n) => { n.textContent = t(n.dataset.t); });
+    applyBtn();
     document.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
     $("#letterLang").value = lang === "en" ? "en" : "ru"; // писем на казахском пока нет
     $("#kkNote").hidden = lang !== "kk"; $("#kkNote").textContent = lang === "kk" ? t("kk_note") : "";
@@ -190,22 +207,71 @@ import { mockExtract } from "/shared/mock.js";
   function renderSamples() {
     const box = $("#samples"); box.textContent = "";
     for (const s of samples) {
-      const b = el("button", "btn secondary sm", t("sample_btn") + s.label[lang]);
+      const b = el("button", "btn secondary sm", t("sample_btn") + L(s.label));
       b.type = "button";
       b.addEventListener("click", () => useSample(s));
       box.append(b);
     }
   }
-  function useSample(s) { fill(s); prevIds = null; last = null; setResultVisible(false); }
+  function useSample(s) { fill(s); clearResult(); }
   // результат есть или нет: вкладки «Проверка» и «Отчёт» показывают либо результат, либо пустое состояние
   function setResultVisible(v) {
     $("#out").hidden = !v; $("#checkEmpty").hidden = v;
     $("#reportBody").hidden = !v; $("#reportEmpty").hidden = v;
   }
+
+  // ---- жизненный цикл результата ----
+  // Результат привязан к документам, на которых считался. Любая правка, очистка или загрузка документа
+  // делает его устаревшим: печать и письмо блокируются до новой проверки, подготовленный отчёт стирается.
+  function docsChanged() {
+    gen++;
+    if (last && !stale) { stale = true; updateExports(); }
+    saveDraftSoon();
+  }
+  function note(cls, text) { for (const box of [$("#out"), $("#reportBody")]) box.prepend(el("p", "warn " + cls, text)); }
+  function updateExports() {
+    $("#printBtn").disabled = !last || stale;
+    $("#mkLetter").disabled = !last || stale;
+    document.querySelectorAll("#out > .stale-note, #reportBody > .stale-note").forEach((n) => n.remove());
+    if (last && stale) {
+      note("stale-note", t("stale_note"));
+      $("#letter").textContent = ""; $("#letter").hidden = true; $("#copyLetter").hidden = true;
+      $("#printReport").textContent = "";
+    }
+  }
+  /** Убрать результат целиком: и с экрана, и из DOM (замечания, письмо, печатный отчёт). */
+  function clearResult() {
+    last = null; prevIds = null; stale = false; lastEntry = null; lastCaseId = null;
+    for (const s of ["#findings", "#reviewList", "#passedList", "#checks", "#inspector", "#diff", "#runMeta", "#reportMeta", "#printReport", "#letter", "#aiMark"]) $(s).textContent = "";
+    document.querySelectorAll(".stale-note, .save-warn").forEach((n) => n.remove());
+    $("#letter").hidden = true; $("#copyLetter").hidden = true;
+    setResultVisible(false); updateExports();
+  }
+
+  // ---- черновик: введённые и загруженные тексты не теряются при перезагрузке (только этот браузер) ----
+  const DRAFT_KEY = "td:draft:v1";
+  let draftTimer = null;
+  function saveDraftSoon() {
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(() => {
+      try { storage?.setItem(DRAFT_KEY, JSON.stringify({ caseId: st.current, docs: Object.fromEntries(ids.map((id) => [id, $("#t-" + id).value])) })); } catch {}
+    }, 300);
+  }
+  function restoreDraft() {
+    let d = null;
+    try { d = JSON.parse(storage?.getItem(DRAFT_KEY) ?? "null"); } catch {}
+    if (!d || typeof d !== "object" || d.caseId !== st.current || typeof d.docs !== "object" || !d.docs) return false;
+    const texts = ids.map((id) => (typeof d.docs[id] === "string" ? d.docs[id].slice(0, 40000) : ""));
+    if (texts.every((x, i) => x === $("#t-" + ids[i]).value)) return false;
+    ids.forEach((id, i) => { if (texts[i] !== $("#t-" + id).value) { $("#t-" + id).value = texts[i]; delete sources[id]; } renderSource(id); });
+    $("#dropStatus").append(el("div", "warn", t("draft_restored")));
+    return true;
+  }
   function fill(s) {
     for (const id of ids) { delete sources[id]; $("#t-" + id).value = ""; }
     for (const d of s.docs) $("#t-" + d.type).value = d.text;
     $("#dropStatus").textContent = ""; ids.forEach(renderSource);
+    docsChanged();
   }
   // Что прочитано из загруженного файла. Только в памяти страницы: на сервере ничего не хранится.
   // Если текст поправили руками, он больше не «из PDF/фото», и разбор фото не отправляется.
@@ -265,6 +331,7 @@ import { mockExtract } from "/shared/mock.js";
       if (type) { sources[type] = { name: file.name, error: code, reason, markers, after }; renderSource(type); }
       else say(`${file.name}: ${errText(code, reason, markers, after)}`, true);
     };
+    if (!$("#consent").checked) return false; // без действующего согласия файл не отправляется
     if (file.size > maxBytes) return fail("file_too_large");
     const st = type ? $("#s-" + type) : $("#dropStatus");
     if (type) { st.className = "status"; st.textContent = t("reading"); }
@@ -280,12 +347,16 @@ import { mockExtract } from "/shared/mock.js";
     if (!target) return say(fmt("unknown_type", { name: file.name }), true);
     $("#t-" + target).value = r.text;
     sources[target] = { name: file.name, size: file.size, kind: r.kind, origin: r.origin, pages: r.pages, text: r.text, extraction: r.extraction, dropped: r.dropped?.length || 0, sha256: r.sha256 };
-    renderSource(target);
+    renderSource(target); docsChanged();
     if (!type) say(fmt("st_placed", { name: file.name, doc: DOCN[lang][target] }));
   }
   async function uploadMany(files, type) {
     if (!type) $("#dropStatus").textContent = "";
-    for (const f of files) await upload(f, type); // по одному файлу на запрос: лимит тела запроса на хостингах
+    // по одному файлу на запрос (лимит тела запроса на хостингах); согласие проверяется перед каждым файлом
+    for (const f of files) {
+      if (!$("#consent").checked) { $("#dropStatus").append(el("div", "bad", t("consent_stopped"))); break; }
+      await upload(f, type);
+    }
   }
 
   const norm = (x) => String(x ?? "").replace(/\s+/g, " ").trim();
@@ -415,9 +486,9 @@ import { mockExtract } from "/shared/mock.js";
   function findingCard(f) {
     const card = el("article", "f");
     const head = el("div", "row u-between");
-    head.append(el("h3", null, f.title[lang]), el("span", "badge " + f.severity, t("sev_" + f.severity)));
+    head.append(el("h3", null, L(f.title)), el("span", "badge " + f.severity, t("sev_" + f.severity)));
     card.append(head);
-    const detail = f.details?.[lang] ?? f.detail;
+    const detail = L(f.details) || f.detail;
     if (detail) card.append(el("p", "d", detail));
     const grid = el("div", "ev-grid");
     for (const e of f.evidence) grid.append(evButton(e));
@@ -459,9 +530,14 @@ import { mockExtract } from "/shared/mock.js";
     if (r.jsonFallback) diff.append(el("p", "warn", t("json_fb_note")));
     if (prevIds && !keepDiff) {
       const now = new Set(r.findings.map((f) => f.id));
-      const fixed = [...prevIds].filter((x) => !now.has(x)), added = [...now].filter((x) => !prevIds.has(x)), still = [...now].filter((x) => prevIds.has(x));
-      const name = (id) => (r.checks.find((c) => c.id === id)?.title[lang]) ?? id;
+      // «исправлено» только при явном pass той же проверки; пропуск (данных больше нет) это «больше не удалось проверить»
+      const passedNow = new Set(r.checks.filter((c) => c.status === "pass").map((c) => c.id));
+      const gone = [...prevIds].filter((x) => !now.has(x));
+      const fixed = gone.filter((x) => passedNow.has(x)), lost = gone.filter((x) => !passedNow.has(x));
+      const added = [...now].filter((x) => !prevIds.has(x)), still = [...now].filter((x) => prevIds.has(x));
+      const name = (id) => L(r.checks.find((c) => c.id === id)?.title) || id;
       fixed.forEach((id) => diff.append(el("span", "badge ok", `${t("fixed")}: ${name(id)}`)));
+      lost.forEach((id) => diff.append(el("span", "badge medium", `${t("lost")}: ${name(id)}`)));
       added.forEach((id) => diff.append(el("span", "badge high", `${t("added")}: ${name(id)}`)));
       if (still.length) diff.append(el("span", "badge medium", `${t("still")}: ${still.length}`));
     }
@@ -478,7 +554,7 @@ import { mockExtract } from "/shared/mock.js";
     const rbox = $("#reviewList"); rbox.textContent = "";
     for (const c of unsure) {
       const card = el("article", "f");
-      card.append(el("h3", null, c.title[lang]), el("p", "d", c.reasonText[lang]));
+      card.append(el("h3", null, L(c.title)), el("p", "d", L(c.reasonText)));
       const grid = el("div", "ev-grid");
       for (const e of c.evidence) grid.append(evButton(e));
       if (grid.children.length) card.append(grid);
@@ -488,21 +564,21 @@ import { mockExtract } from "/shared/mock.js";
     $("#cntReview").textContent = `(${unsure.length})`;
     const passed = r.checks.filter((c) => c.status === "pass");
     const pbox = $("#passedList"); pbox.textContent = "";
-    for (const c of passed) { const li = el("li"); li.append(el("span", "ok", "✓"), el("span", null, c.title[lang])); pbox.append(li); }
+    for (const c of passed) { const li = el("li"); li.append(el("span", "ok", "✓"), el("span", null, L(c.title))); pbox.append(li); }
     if (!passed.length) pbox.append(el("li", null, t("none_ok")));
     $("#cntOk").textContent = `(${passed.length})`;
 
     const ibox = $("#inspector"); ibox.textContent = "";
     if (!r.inspector.questions.length) ibox.append(el("p", "note", t("insp_none")));
     for (const q of r.inspector.questions) {
-      const d = el("div", "q"); d.append(el("p", null, q.q[lang]));
+      const d = el("div", "q"); d.append(el("p", null, L(q.q)));
       const meta = el("small", null, `${q.rule} · ${t("demo")} · ${q.status}`); d.append(meta); ibox.append(d);
     }
     $("#inspNote").textContent = t("insp_note") + (r.inspector.noRule.length ? " " + t("no_rule") + r.inspector.noRule.join(", ") : "");
 
     const cl = $("#checks"); cl.textContent = "";
     for (const c of r.checks) {
-      const li = el("li", c.status); li.append(el("i", null, c.status === "pass" ? "✓" : c.status === "fail" ? "!" : c.reasonText ? "?" : "–"), el("span", null, c.title[lang] + (c.reasonText ? ` (${c.reasonText[lang]})` : "")));
+      const li = el("li", c.status); li.append(el("i", null, c.status === "pass" ? "✓" : c.status === "fail" ? "!" : c.reasonText ? "?" : "–"), el("span", null, L(c.title) + (c.reasonText ? ` (${L(c.reasonText)})` : "")));
       cl.append(li);
     }
     $("#letter").hidden = true; $("#copyLetter").hidden = true;
@@ -511,41 +587,64 @@ import { mockExtract } from "/shared/mock.js";
     const top = Object.entries(cited).sort((a, b) => b[1] - a[1])[0];
     if (top && !keepDiff) $("#fixType").value = top[0];
     last = r;
+    updateExports();
   }
 
   async function run() {
+    if (running) return; // одна проверка за раз: смена языка и другие кнопки второй запуск не открывают
     const docs = getDocs(); if (!docs.length || !$("#consent").checked) return;
-    const btn = $("#run"); btn.disabled = true; const old = btn.textContent; btn.textContent = t("loading");
+    // снимок на старте: дело, ревизия документов и сами документы. Ответ применяется только к ним.
+    const job = { gen, caseId: st.current };
+    running = job; updateRunBtn();
     setResultVisible(true);
     const fbox = $("#findings"); fbox.textContent = ""; for (let i = 0; i < 3; i++) fbox.append(el("span", "sk"));
-    let r;
+    let r, err = null;
     try {
       const res = await fetch("/api/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ docs }), signal: AbortSignal.timeout(CHECK_TIMEOUT_MS) });
       if (!res.ok) { const b = await res.json().catch(() => ({})); throw Object.assign(new Error(String(res.status)), { code: b.code, markers: b.markers }); }
       r = await res.json();
-    } catch (e) {
+    } catch (e) { err = e; }
+    running = null; updateRunBtn();
+    const c0 = CS.currentCase(st);
+    if (gen !== job.gen || st.current !== job.caseId || (job.caseId && !c0)) {
+      // пока ждали ответ, сменили дело, удалили данные или поправили документы: старый ответ не применяется
       fbox.textContent = "";
-      fbox.append(el("p", "warn", e?.name === "TimeoutError" ? t("e_client_timeout") : e?.code ? errText(e.code, null, e.markers) : t("err")));
-      btn.disabled = false; applyBtn(); showTab("check"); return;
+      const msg = t("discarded_note");
+      fbox.append(el("p", "warn stale-note", msg)); $("#dropStatus").append(el("div", "warn stale-note", msg));
+      if (last) renderResult(last, true); else setResultVisible(false);
+      return;
+    }
+    if (err) {
+      fbox.textContent = "";
+      fbox.append(el("p", "warn", err?.name === "TimeoutError" ? t("e_client_timeout") : err?.code ? errText(err.code, null, err.markers) : t("err")));
+      showTab("check"); return;
     }
     // дело груза: сравнение с прошлой проверкой этого дела, новая версия документа только если текст изменился
-    const c = CS.currentCase(st) ?? CS.newCase(st, { title: $("#caseName").value, departure: $("#caseDep").value });
+    const c = c0 ?? CS.newCase(st, { title: $("#caseName").value, departure: $("#caseDep").value });
     const lc = c.checks.at(-1);
     prevIds = lc ? new Set(lc.findings.map((f) => f.id)) : null;
+    stale = false;
+    const vs = CS.addVersions(c, docs.map((d) => ({ ...d, name: d.origin ? sources[d.type]?.name ?? "" : "", kind: d.origin ? sources[d.type]?.kind ?? "" : "" })));
+    lastEntry = CS.recordCheck(c, { ...vs, result: r }); lastCaseId = c.id;
     renderResult(r, false);
     showTab("check");
-    btn.disabled = false; btn.textContent = old; applyBtn();
-    const vs = CS.addVersions(c, docs.map((d) => ({ ...d, name: d.origin ? sources[d.type]?.name ?? "" : "", kind: d.origin ? sources[d.type]?.kind ?? "" : "" })));
-    CS.recordCheck(c, { ...vs, result: r });
     persist(); renderCase();
+    // ошибка сохранения видна рядом с результатом, а не только во вкладке «Дело груза»
+    document.querySelectorAll(".save-warn").forEach((n) => n.remove());
+    if (storeErr) note("save-warn", `${t("not_saved")} ${t("st_err_" + storeErr)}`);
+    else try { storage?.removeItem(DRAFT_KEY); } catch {}
   }
-  const applyBtn = () => { $("#run").textContent = t("run"); };
+  const applyBtn = () => { $("#run").textContent = running ? t("loading") : t("run"); };
+  function updateRunBtn() { $("#run").disabled = !$("#consent").checked || !!running; applyBtn(); }
 
   async function mkLetter() {
-    if (!last) return;
+    if (!last || stale) return;
+    const at = gen, r0 = last;
     const res = await fetch("/api/letter", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ findings: last.findings, lang: $("#letterLang").value, mode: { ai: !!isAi(last.provider), label: last.provider?.label, model: last.provider?.model } }) });
     if (!res.ok) return;
-    const box = $("#letter"); box.textContent = (await res.json()).text; box.hidden = false; $("#copyLetter").hidden = false;
+    const text = (await res.json()).text;
+    if (gen !== at || last !== r0 || stale) return; // документы или дело сменились, пока готовилось письмо
+    const box = $("#letter"); box.textContent = text; box.hidden = false; $("#copyLetter").hidden = false;
   }
 
   document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => { lang = b.dataset.lang; try { localStorage.setItem("td:lang", lang); } catch {} applyLang(); }));
@@ -581,7 +680,7 @@ import { mockExtract } from "/shared/mock.js";
   // файл, брошенный мимо зоны, браузер не должен открывать вместо страницы
   window.addEventListener("dragover", (e) => e.preventDefault());
   window.addEventListener("drop", (e) => e.preventDefault());
-  ids.forEach((id) => $("#t-" + id).addEventListener("input", () => renderSource(id)));
+  ids.forEach((id) => $("#t-" + id).addEventListener("input", () => { renderSource(id); docsChanged(); }));
   $("#mkLetter").addEventListener("click", mkLetter);
   $("#copyLetter").addEventListener("click", async () => {
     try { await navigator.clipboard.writeText($("#letter").textContent); const b = $("#copyLetter"); b.textContent = t("copied"); setTimeout(() => { b.textContent = t("copy"); }, 1500); } catch {}
@@ -645,8 +744,9 @@ import { mockExtract } from "/shared/mock.js";
       if (prev && e.changed?.length) li.append(el("div", null, `${t("h_changed")}: ${e.changed.map((ch) => `${DOCN[lang][ch.type]} ${ch.from ? `v${ch.from} → ` : ""}v${ch.to}`).join(", ")}`));
       if (prev) {
         const d = CS.diffChecks(prev, e);
-        const nm = (id) => [...e.findings, ...prev.findings].find((f) => f.id === id)?.title[lang] ?? id;
+        const nm = (id) => L([...e.findings, ...prev.findings].find((f) => f?.id === id)?.title) || id;
         if (d.fixed.length) li.append(el("div", "ok", `${t("h_fixed")}: ${d.fixed.map(nm).join(", ")}`));
+        if (d.lost?.length) li.append(el("div", null, `${t("h_lost")}: ${d.lost.map(nm).join(", ")}`));
         if (d.added.length) li.append(el("div", "bad", `${t("h_added")}: ${d.added.map(nm).join(", ")}`));
         li.append(el("div", null, `${t("h_still")}: ${e.findings.length}`));
       } else li.append(el("div", null, t("h_first")));
@@ -669,13 +769,14 @@ import { mockExtract } from "/shared/mock.js";
   // последние версии документов дела обратно в поля
   function loadCaseDocs(c) {
     for (const type of ids) {
-      const v = c ? CS.latest(c, type) : null;
+      const e = c?.checks.at(-1);
+      const v = !c ? null : e ? (e.versions[type] ? c.docs[type].find((x) => x.v === e.versions[type]) ?? null : null) : CS.latest(c, type);
       $("#t-" + type).value = v?.text ?? "";
       if (v && (v.name || v.origin !== "text")) sources[type] = { name: v.name, kind: "restored", v: v.v, origin: v.origin, text: v.text, extraction: v.extraction };
       else delete sources[type];
       renderSource(type);
     }
-    last = null; setResultVisible(false); $("#docDiff").hidden = true;
+    gen++; clearResult(); $("#docDiff").hidden = true;
   }
 
   $("#caseSel").addEventListener("change", (e) => {
@@ -695,6 +796,8 @@ import { mockExtract } from "/shared/mock.js";
       CS.clearAll(storage);
       try { for (const k of Object.keys(storage)) if (k.startsWith("td:")) storage.removeItem(k); } catch {}
     }
+    clearTimeout(draftTimer);
+    try { storage?.removeItem(DRAFT_KEY); } catch {}
     st = CS.emptyState(); storeErr = storage ? null : "unavailable";
     $("#consent").checked = false; applyConsent();
     showStoreErr(); renderCase(); loadCaseDocs(null); $("#dropStatus").textContent = "";
@@ -705,7 +808,8 @@ import { mockExtract } from "/shared/mock.js";
   try { $("#consent").checked = storage?.getItem(CONSENT_KEY) === CONSENT_VERSION; } catch {}
   function applyConsent() {
     const ok = $("#consent").checked;
-    for (const n of document.querySelectorAll("#pickAll, #loadPack, [data-pick], #fixBtn, #run")) n.disabled = !ok;
+    for (const n of document.querySelectorAll("#pickAll, #loadPack, [data-pick], #fixBtn")) n.disabled = !ok;
+    updateRunBtn();
     $("#drop").classList.toggle("off", !ok);
     $("#consentHint").textContent = ok ? "" : t("consent_needed");
   }
@@ -731,8 +835,10 @@ import { mockExtract } from "/shared/mock.js";
 
   // печатный отчёт: замечания с цитатами и страницами; «правильных» значений и расчётов в нём нет
   function buildPrint() {
-    const r = last; if (!r) return false;
-    const c = CS.currentCase(st), e = c?.checks.at(-1), prev = c?.checks.at(-2);
+    const r = last; if (!r || stale) return false;
+    const c = CS.currentCase(st);
+    const e = c && lastCaseId === c.id && c.checks.includes(lastEntry) ? lastEntry : null;
+    const prev = e ? c.checks[c.checks.indexOf(e) - 1] : null;
     const P = $("#printReport"); P.textContent = "";
     const add = (tag, cls, text) => { const n = el(tag, cls, text); P.append(n); return n; };
     const q = (s) => t("ql") + s + t("qr");
@@ -745,14 +851,15 @@ import { mockExtract } from "/shared/mock.js";
     if (r.aiUnavailable) add("div", null, t("ai_down"));
     add("h2", null, t("pr_docs"));
     for (const type of ids) {
-      const v = c ? CS.latest(c, type) : null; if (!v) continue;
-      add("div", null, `${DOCN[lang][type]} v${v.v}${v.name ? " · " + v.name : ""} · ${t("src_" + (v.origin || "text"))}`);
+      const n = e?.versions?.[type]; if (!n) continue;
+      const v = c.docs[type].find((x) => x.v === n);
+      add("div", null, `${DOCN[lang][type]} v${n}${v?.name ? " · " + v.name : ""} · ${t("src_" + (v?.origin || "text"))}`);
     }
     add("h2", null, t("pr_result"));
     add("div", null, fmt("pr_passed", { p: r.passed, t: r.total, s: r.skipped }));
     if (prev && e) {
       const d = CS.diffChecks(prev, e);
-      const nm = (id) => [...e.findings, ...prev.findings].find((f) => f.id === id)?.title[lang] ?? id;
+      const nm = (id) => L([...e.findings, ...prev.findings].find((f) => f?.id === id)?.title) || id;
       add("h2", null, t("pr_changes"));
       add("div", null, `${t("h_fixed")}: ${d.fixed.map(nm).join(", ") || "—"}`);
       add("div", null, `${t("h_added")}: ${d.added.map(nm).join(", ") || "—"}`);
@@ -762,7 +869,7 @@ import { mockExtract } from "/shared/mock.js";
     if (!r.findings.length) add("div", null, t("pr_none"));
     r.findings.forEach((f, i) => {
       const b = add("div", "pf");
-      b.append(el("div", null, `${i + 1}. ${f.title[lang]} · ${t("sev_" + f.severity)}`));
+      b.append(el("div", null, `${i + 1}. ${L(f.title)} · ${t("sev_" + f.severity)}`));
       for (const ev of f.evidence) b.append(el("div", "q", quoteLine(ev)));
     });
     const unsure = r.checks.filter((x) => x.status === "skip" && x.reasonText);
@@ -770,7 +877,7 @@ import { mockExtract } from "/shared/mock.js";
       add("h2", null, t("pr_confirm"));
       for (const x of unsure) {
         const b = add("div", "pf");
-        b.append(el("div", null, `${x.title[lang]}: ${x.reasonText[lang]}`));
+        b.append(el("div", null, `${L(x.title)}: ${L(x.reasonText)}`));
         for (const ev of x.evidence) b.append(el("div", "q", quoteLine(ev)));
       }
     }
@@ -802,7 +909,7 @@ import { mockExtract } from "/shared/mock.js";
     $("#tabbtn-" + TABS[n]).focus();
   });
   document.querySelectorAll("[data-toggle]").forEach((b) => b.addEventListener("click", () => setRaw(b.dataset.toggle, $("#raw-" + b.dataset.toggle).hidden)));
-  document.querySelectorAll("[data-clear]").forEach((b) => b.addEventListener("click", () => { const id = b.dataset.clear; $("#t-" + id).value = ""; delete sources[id]; renderSource(id); }));
+  document.querySelectorAll("[data-clear]").forEach((b) => b.addEventListener("click", () => { const id = b.dataset.clear; $("#t-" + id).value = ""; delete sources[id]; renderSource(id); docsChanged(); }));
   $("#loadPack").addEventListener("click", () => $("#fileAll").click());
   $("#demoPack").addEventListener("click", () => { if (samples[1]) useSample(samples[1]); });
   $("#goDocs").addEventListener("click", () => showTab("documents"));
@@ -814,7 +921,9 @@ import { mockExtract } from "/shared/mock.js";
     try { samples = await (await fetch("/api/samples")).json(); } catch {}
     applyLang();
     const c = CS.currentCase(st);
-    if (c && ids.some((x) => c.docs[x].length)) loadCaseDocs(c);
-    else if (samples[1]) fill(samples[1]);
+    if (c) loadCaseDocs(c);
+    else if (!st.cases.length && samples[1]) fill(samples[1]);
+    restoreDraft();
+    if (storeErr) $("#dropStatus").append(el("div", "warn", t("st_err_" + storeErr)));
   })();
 })();

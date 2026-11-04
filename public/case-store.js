@@ -13,22 +13,40 @@ export const MAX_BYTES = 2_000_000;
 
 const isStr = (x) => typeof x === "string";
 const isInt = (x) => Number.isInteger(x) && x >= 0;
-/** Проверка одного дела при чтении: повреждённые части отбрасываются, остальное остаётся. */
+const isObj = (x) => !!x && typeof x === "object" && !Array.isArray(x);
+const isText = (x) => isObj(x) && Object.values(x).every(isStr); // { ru, en, … }
+const validEvidence = (e) => isObj(e) && isStr(e.doc) && isStr(e.quote ?? "");
+const validFinding = (f) => isObj(f) && isStr(f.id) && isText(f.title) && Array.isArray(f.evidence) && f.evidence.every(validEvidence);
+const validUnsure = (u) => isObj(u) && isStr(u.id) && isText(u.title) && (u.reasonText === undefined || isText(u.reasonText)) && Array.isArray(u.evidence ?? []) && (u.evidence ?? []).every(validEvidence);
+const strList = (x) => x === undefined || (Array.isArray(x) && x.every(isStr));
+/** Запись истории проверяется целиком, включая вложенные замечания: одна битая часть отбрасывает запись. */
+function validCheck(e) {
+  return isObj(e) && isInt(e.at) && isObj(e.versions) && Object.values(e.versions).every(isInt)
+    && Array.isArray(e.findings) && e.findings.every(validFinding)
+    && (e.unsure === undefined || (Array.isArray(e.unsure) && e.unsure.every(validUnsure)))
+    && strList(e.passedIds);
+}
+/** Проверка одного дела при чтении: повреждённые части отбрасываются (damaged), остальное остаётся. */
 function cleanCase(c) {
   if (!c || !isStr(c.id) || !c.id) return null;
+  let damaged = false;
   const docs = {};
   for (const t of DOC_TYPES) {
     const list = Array.isArray(c.docs?.[t]) ? c.docs[t] : [];
-    docs[t] = list.filter((v) => v && isInt(v.v) && isStr(v.text) && v.text.length <= 40000)
-      .map((v) => ({ v: v.v, at: isInt(v.at) ? v.at : 0, text: v.text, origin: isStr(v.origin) ? v.origin : "text", name: isStr(v.name) ? v.name.slice(0, 200) : "", kind: isStr(v.kind) ? v.kind : "", ...(v.extraction && typeof v.extraction === "object" ? { extraction: v.extraction } : {}) }))
+    const ok = list.filter((v) => v && isInt(v.v) && isStr(v.text) && v.text.length <= 40000);
+    if (ok.length < list.length) damaged = true;
+    docs[t] = ok.map((v) => ({ v: v.v, at: isInt(v.at) ? v.at : 0, text: v.text, origin: isStr(v.origin) ? v.origin : "text", name: isStr(v.name) ? v.name.slice(0, 200) : "", kind: isStr(v.kind) ? v.kind : "", ...(isObj(v.extraction) ? { extraction: v.extraction } : {}) }))
       .slice(-LIMITS.versionsPerDoc);
   }
-  const checks = (Array.isArray(c.checks) ? c.checks : [])
-    .filter((e) => e && isInt(e.at) && Array.isArray(e.findings) && e.versions && typeof e.versions === "object")
-    .slice(-LIMITS.checksPerCase);
+  const all = Array.isArray(c.checks) ? c.checks : [];
+  const checks = all.filter(validCheck);
+  if (checks.length < all.length) damaged = true;
   return {
-    id: c.id, title: isStr(c.title) ? c.title.slice(0, 120) : "", departure: isStr(c.departure) && validDate(c.departure) ? c.departure : "",
-    createdAt: isInt(c.createdAt) ? c.createdAt : 0, updatedAt: isInt(c.updatedAt) ? c.updatedAt : 0, docs, checks,
+    case: {
+      id: c.id, title: isStr(c.title) ? c.title.slice(0, 120) : "", departure: isStr(c.departure) && validDate(c.departure) ? c.departure : "",
+      createdAt: isInt(c.createdAt) ? c.createdAt : 0, updatedAt: isInt(c.updatedAt) ? c.updatedAt : 0, docs, checks: checks.slice(-LIMITS.checksPerCase),
+    },
+    damaged,
   };
 }
 
@@ -43,9 +61,11 @@ export function loadState(storage) {
   try {
     const s = JSON.parse(raw);
     if (s?.v !== 1 || !Array.isArray(s.cases)) throw new Error("shape");
-    const cases = s.cases.map(cleanCase).filter(Boolean).slice(-LIMITS.cases);
+    const cleaned = s.cases.map(cleanCase).filter(Boolean);
+    const cases = cleaned.map((x) => x.case).slice(-LIMITS.cases);
     const current = cases.some((c) => c.id === s.current) ? s.current : cases.at(-1)?.id ?? null;
-    return { state: { v: 1, cases, current }, error: cases.length < s.cases.length ? "partial" : null };
+    const partial = cleaned.length < s.cases.length || cleaned.some((x) => x.damaged);
+    return { state: { v: 1, cases, current }, error: partial ? "partial" : null };
   } catch {
     return { state: emptyState(), error: "corrupt" };
   }
@@ -136,6 +156,8 @@ export function recordCheck(c, { versions, changed = [], result, now = Date.now(
     findings: result.findings.map((f) => ({ id: f.id, title: f.title, severity: f.severity, evidence: f.evidence.map(slimEvidence) })),
     unsure: result.checks.filter((x) => x.status === "skip" && x.reasonText)
       .map((x) => ({ id: x.id, title: x.title, reasonText: x.reasonText, evidence: x.evidence.map(slimEvidence) })),
+    // какие проверки явно пройдены: «исправлено» засчитывается только по ним (diffChecks)
+    passedIds: result.checks.filter((x) => x.status === "pass").map((x) => x.id),
   };
   c.checks.push(entry);
   if (c.checks.length > LIMITS.checksPerCase) c.checks.splice(0, c.checks.length - LIMITS.checksPerCase);
@@ -143,10 +165,16 @@ export function recordCheck(c, { versions, changed = [], result, now = Date.now(
   return entry;
 }
 
-/** Что изменилось между двумя проверками: исправлено, новое, осталось (по видам проверок). */
+/**
+ * Что изменилось между двумя проверками (по видам проверок): исправлено, больше не удалось проверить, новое, осталось.
+ * «Исправлено» только если та же проверка в новой записи явно пройдена; если она пропущена (данные исчезли,
+ * нужна ручная проверка) или в старой записи нет списка пройденных, это lost, а не исправление.
+ */
 export function diffChecks(prev, cur) {
-  const a = new Set((prev?.findings ?? []).map((f) => f.id)), b = new Set((cur?.findings ?? []).map((f) => f.id));
-  return { fixed: [...a].filter((x) => !b.has(x)), added: [...b].filter((x) => !a.has(x)), still: [...b].filter((x) => a.has(x)) };
+  const a = new Set((prev?.findings ?? []).map((f) => f?.id)), b = new Set((cur?.findings ?? []).map((f) => f?.id));
+  const passed = new Set(cur?.passedIds ?? []);
+  const gone = [...a].filter((x) => !b.has(x));
+  return { fixed: gone.filter((x) => passed.has(x)), lost: gone.filter((x) => !passed.has(x)), added: [...b].filter((x) => !a.has(x)), still: [...b].filter((x) => a.has(x)) };
 }
 
 /** Построчная разница двух версий документа (наибольшая общая подпоследовательность). */

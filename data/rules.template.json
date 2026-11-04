@@ -1,0 +1,13 @@
+{
+  "_comment": "Шаблон для data/rules.json. Правила заполняет владелец проекта ТОЛЬКО из официальных источников. Без source_url (https) и checked_on (ГГГГ-ММ-ДД) запись всегда needs_review и показывается как «не проверено». Проверка: npm run rules:check",
+  "rules": [
+    {
+      "id": "R-001",
+      "checks": ["gross_weight"],
+      "q": { "ru": "", "en": "", "kk": "" },
+      "source_url": null,
+      "checked_on": null,
+      "status": "needs_review"
+    }
+  ]
+}

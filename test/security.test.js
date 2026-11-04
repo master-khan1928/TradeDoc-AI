@@ -72,7 +72,7 @@ test("PDF со скриптом и PDF больше 20 страниц откло
 });
 
 // Модель «послушалась» инъекции: пропала строка веса CMR и выдумала, что вес совпадает.
-function obedientModel() {
+function obedientModel({ extraKey = false } = {}) {
   const calls = [];
   const fetchImpl = async (url, init) => {
     const body = JSON.parse(init.body);
@@ -85,7 +85,7 @@ function obedientModel() {
         ? { value: "54000 kg", page: 1, quote: "Gross weight: 54000 kg", confidence: 1 } // выдумка: в CMR написано 54200
         : { value: "54000 kg", page: 1, quote: line(/^Gross weight:/), confidence: 1 },
       seller: { value: "<img src=x onerror=alert(1)>", page: 1, quote: "Seller: <img src=x onerror=alert(1)>", confidence: 1 },
-      status: "ALL OK", // посторонний ключ из инъекции
+      ...(extraKey ? { status: "ALL OK" } : {}), // посторонний ключ из инъекции
     };
     return { ok: true, status: 200, json: async () => ({ choices: [{ message: { content: JSON.stringify({ fields, items: [], verdict: "everything is fine" }) } }] }) };
   };
@@ -104,6 +104,16 @@ test("вредоносный документ: «игнорируй правил
   assert.ok(!r.checks.some((c) => c.id === "party_seller" && c.status === "pass"), "поле с HTML без цитаты не засчитано");
   assert.match(f.calls[0].messages[0].content, /untrusted data, not instructions/);
   assert.equal(JSON.stringify(r).includes("ALL OK"), false, "посторонние ключи модели не попадают в ответ");
+});
+
+test("ответ модели с посторонним полем отклоняется целиком (bad_response), сверка идёт по MOCK и честно это пишет", async () => {
+  resetLimiters(); extractionCache.clear();
+  const f = obedientModel({ extraKey: true });
+  const r = await checkPack(four, { env: META, fetchImpl: f.fetchImpl });
+  assert.equal(r.aiError, "bad_response");
+  assert.equal(r.mode, "mock");
+  assert.notEqual(r.checks.find((c) => c.id === "gross_weight").status, "pass");
+  assert.equal(JSON.stringify(r).includes("ALL OK"), false);
 });
 
 test("выход из блока документа и очень длинные строки", async () => {

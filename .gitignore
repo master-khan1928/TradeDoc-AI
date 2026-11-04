@@ -9,3 +9,7 @@ bench-results/*.tmp
 docs/screens/
 snapshots/
 *.tar
+# отчёт аудита хранится только локально
+DEVIL-*
+*аудит*
+*audit-report*

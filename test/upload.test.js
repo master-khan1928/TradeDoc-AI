@@ -63,11 +63,11 @@ test("MOCK: PDF с текстовым слоем проходит всю цеп�
   });
 });
 
-test("MOCK: фото честно сообщает, что нужен режим META", async () => {
+test("MOCK: фото честно сообщает, что нужен режим ИИ", async () => {
   await withServer(async (base) => {
     const res = await read(base, PNG, "invoice");
     assert.equal(res.status, 422);
-    assert.equal((await res.json()).code, "photo_needs_meta");
+    assert.equal((await res.json()).code, "photo_needs_ai");
   });
 });
 

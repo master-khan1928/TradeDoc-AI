@@ -62,7 +62,7 @@ run("путь демо в MOCK: загрузка PDF без указания т�
   const r2 = await checkPack(docs.map((d) => (d.type === "cmr" ? { type: "cmr", text: fixed.text, origin: "pdf" } : d)), { env: {} });
   assert.deepEqual(r2.findings.map((f) => f.id), ["item_qty"], "вес брутто исправлен, количество в упаковочном листе осталось");
 
-  await assert.rejects(read("05-packing-list-photo.png"), (e) => e.code === "photo_needs_meta");
+  await assert.rejects(read("05-packing-list-photo.png"), (e) => e.code === "photo_needs_ai");
 });
 
 run("сборка воспроизводима: те же входные данные дают те же байты", async () => {

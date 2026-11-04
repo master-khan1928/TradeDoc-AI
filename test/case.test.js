@@ -103,3 +103,24 @@ test("дело: переименование, дата, удаление", () =>
   CS.deleteCase(st, b.id);
   assert.equal(CS.currentCase(st).id, a.id);
 });
+
+test("localStorage: повреждённое дело отбрасывается, остальные читаются; лимит размера", () => {
+  const s = memoryStorage();
+  const st = CS.emptyState();
+  const good = CS.newCase(st, { title: "ok" });
+  CS.addVersions(good, [{ type: "invoice", text: "INVOICE" }]);
+  const raw = JSON.parse(JSON.stringify(st));
+  raw.cases.push({ id: 5, docs: "broken" }, null, { id: "x", docs: { invoice: [{ v: "one", text: 1 }] }, checks: [{ bad: true }] });
+  s.setItem(CS.STORAGE_KEY, JSON.stringify(raw));
+  const r = CS.loadState(s);
+  assert.equal(r.error, "partial");
+  assert.deepEqual(r.state.cases.map((c) => c.id), [good.id, "x"]);
+  assert.deepEqual(r.state.cases[1].docs.invoice, [], "битая версия отброшена, дело осталось");
+  assert.equal(r.state.cases[0].docs.invoice[0].text, "INVOICE");
+  s.setItem(CS.STORAGE_KEY, JSON.stringify({ v: 2, cases: [] }));
+  assert.equal(CS.loadState(s).error, "corrupt", "неизвестная версия схемы не читается");
+  const big = CS.emptyState();
+  const c = CS.newCase(big, {});
+  CS.addVersions(c, [{ type: "invoice", text: "x".repeat(CS.MAX_BYTES + 10) }]);
+  assert.equal(CS.saveState(memoryStorage(), big).error, "too_large");
+});

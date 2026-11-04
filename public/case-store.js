@@ -8,7 +8,34 @@ export const DOC_TYPES = ["invoice", "packing", "cmr"];
 
 export const emptyState = () => ({ v: 1, cases: [], current: null });
 
-/** Чтение без падений: приватный режим, запрет хранилища и испорченные данные дают пустое состояние и причину. */
+// Не больше ~2 МБ на все дела: у localStorage обычно около 5 МБ на сайт, место нужно и другим ключам.
+export const MAX_BYTES = 2_000_000;
+
+const isStr = (x) => typeof x === "string";
+const isInt = (x) => Number.isInteger(x) && x >= 0;
+/** Проверка одного дела при чтении: повреждённые части отбрасываются, остальное остаётся. */
+function cleanCase(c) {
+  if (!c || !isStr(c.id) || !c.id) return null;
+  const docs = {};
+  for (const t of DOC_TYPES) {
+    const list = Array.isArray(c.docs?.[t]) ? c.docs[t] : [];
+    docs[t] = list.filter((v) => v && isInt(v.v) && isStr(v.text) && v.text.length <= 40000)
+      .map((v) => ({ v: v.v, at: isInt(v.at) ? v.at : 0, text: v.text, origin: isStr(v.origin) ? v.origin : "text", name: isStr(v.name) ? v.name.slice(0, 200) : "", kind: isStr(v.kind) ? v.kind : "", ...(v.extraction && typeof v.extraction === "object" ? { extraction: v.extraction } : {}) }))
+      .slice(-LIMITS.versionsPerDoc);
+  }
+  const checks = (Array.isArray(c.checks) ? c.checks : [])
+    .filter((e) => e && isInt(e.at) && Array.isArray(e.findings) && e.versions && typeof e.versions === "object")
+    .slice(-LIMITS.checksPerCase);
+  return {
+    id: c.id, title: isStr(c.title) ? c.title.slice(0, 120) : "", departure: isStr(c.departure) && validDate(c.departure) ? c.departure : "",
+    createdAt: isInt(c.createdAt) ? c.createdAt : 0, updatedAt: isInt(c.updatedAt) ? c.updatedAt : 0, docs, checks,
+  };
+}
+
+/**
+ * Чтение без падений: приватный режим, запрет хранилища и испорченные данные дают пустое состояние и причину.
+ * Версия схемы v: 1; неизвестная версия не читается. Повреждённые дела отбрасываются по одному (error: "partial").
+ */
 export function loadState(storage) {
   let raw;
   try { raw = storage?.getItem(STORAGE_KEY); } catch { return { state: emptyState(), error: "unavailable" }; }
@@ -16,7 +43,9 @@ export function loadState(storage) {
   try {
     const s = JSON.parse(raw);
     if (s?.v !== 1 || !Array.isArray(s.cases)) throw new Error("shape");
-    return { state: s, error: null };
+    const cases = s.cases.map(cleanCase).filter(Boolean).slice(-LIMITS.cases);
+    const current = cases.some((c) => c.id === s.current) ? s.current : cases.at(-1)?.id ?? null;
+    return { state: { v: 1, cases, current }, error: cases.length < s.cases.length ? "partial" : null };
   } catch {
     return { state: emptyState(), error: "corrupt" };
   }
@@ -24,7 +53,9 @@ export function loadState(storage) {
 
 export function saveState(storage, state) {
   try {
-    storage.setItem(STORAGE_KEY, JSON.stringify(state));
+    const json = JSON.stringify(state);
+    if (json.length > MAX_BYTES) return { ok: false, error: "too_large" };
+    storage.setItem(STORAGE_KEY, json);
     return { ok: true, error: null };
   } catch (e) {
     const quota = e?.name === "QuotaExceededError" || e?.code === 22 || e?.code === 1014;

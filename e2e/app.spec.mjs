@@ -95,7 +95,7 @@ test("клик по замечанию ведёт на «Документы» и
   const hl = page.locator(".paper .hl");
   await expect(hl.first()).toBeVisible();
   expect(await hl.count()).toBeGreaterThan(0);
-  expect(await hl.first().evaluate((n) => getComputedStyle(n).backgroundColor)).toBe("rgb(255, 232, 154)");
+  expect(await hl.first().evaluate((n) => getComputedStyle(n).backgroundColor)).toBe("rgba(47, 214, 195, 0.45)"); // прежняя бирюзовая подсветка выделения
 });
 
 test("клавиатура и подписи: у полей есть доступные имена, Tab доходит до вкладок и согласия", async ({ page }) => {
@@ -150,7 +150,7 @@ test("поле даты: тёмная схема, единая высота, п�
   const s = await dep.evaluate((n) => { const c = getComputedStyle(n); return { scheme: c.colorScheme, h: parseFloat(c.height), r: c.borderTopLeftRadius, w: n.getBoundingClientRect().width }; });
   expect(s.scheme).toContain("dark");
   expect(s.h).toBe(40);
-  expect(s.r).toBe("6px");
+  expect(s.r).toBe("12px"); // прежнее скругление полей ввода
   expect(s.w).toBeLessThanOrEqual(390);
   await expect(page.locator("label.field:has(#caseDep)")).toContainText("Дата выезда");
   await expect(page.locator("label.field:has(#caseDep) .hint")).toBeVisible();

@@ -55,7 +55,7 @@ if (phase === "before") {
     await page.locator("#consent").check();
     await page.locator("#run").click();
     await page.locator("#findings article").first().waitFor();
-    await page.waitForTimeout(600);
+    await page.waitForTimeout(1400);
     await shot(page, `${width}-02-check.png`, page);
     await page.locator("#tabbtn-case").click();
     await page.waitForTimeout(300);

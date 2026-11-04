@@ -132,20 +132,28 @@ async function probeLog(script, image = false) {
   return { code, out, calls: f.calls };
 }
 
+// контрольные поля PROBE_DOC (lib/probe.js): без них зонд не говорит «работает» (аудит №44)
+const CONTROL = {
+  number: { value: "INV-2026-0042", page: 1, quote: "Invoice No: INV-2026-0042", confidence: 1 },
+  gross_weight: { value: "11220 kg", page: 1, quote: "Gross weight: 11220 kg", confidence: 1 },
+  total: { value: "2420.00", page: 1, quote: "Total: 2420.00", confidence: 1 },
+};
+
 test("зонд: успех, статус, json_schema, сколько полей прошло проверку цитат", async () => {
   resetJsonFallback();
-  const reply = { fields: { number: { value: "INV-2026-0042", page: 1, quote: "Invoice No: INV-2026-0042", confidence: 1 }, total: { value: "9", page: 1, quote: "Total: 9.00", confidence: 1 } }, items: [] };
+  const reply = { fields: { ...CONTROL, currency: { value: "EUR", page: 1, quote: "Currency: EUR", confidence: 1 } }, items: [] }; // currency выдумана
   const { code, out, calls } = await probeLog([okJson(reply)]);
   assert.equal(code, 0);
   assert.equal(calls.length, 1);
-  assert.match(out, /HTTP-статус: 200 \(json_schema\)/);
+  assert.match(out, /HTTP-статус: 200 · формат запроса: json_schema/);
   assert.match(out, /json_schema: поддерживается/);
-  assert.match(out, /полей 1 из 2/);
+  assert.match(out, /полей 3 из 4/);
+  assert.match(out, /контрольные поля прочитаны/);
 });
 
 test("зонд: json_schema не принят, запасной режим работает", async () => {
   resetJsonFallback();
-  const { code, out } = await probeLog([{ status: 400, text: "unsupported response_format" }, okJson({ fields: {}, items: [] })]);
+  const { code, out } = await probeLog([{ status: 400, text: "unsupported response_format" }, okJson({ fields: CONTROL, items: [] })]);
   assert.equal(code, 0);
   assert.match(out, /НЕ поддерживается \(HTTP 400\); работает запасной режим/);
   resetJsonFallback();
@@ -162,12 +170,17 @@ test("зонд: диагнозы 401, 404, 429, сеть; без повторо�
 
 test("зонд --image: картинка уходит как data URI, цитаты сверяются с расшифровкой модели", async () => {
   resetJsonFallback();
-  const transcription = "INVOICE\nINVOICE NO: INV-2026-0042\nTOTAL: 2420.00";
-  const reply = { transcription, fields: { number: { value: "INV-2026-0042", page: 1, quote: "INVOICE NO: INV-2026-0042", confidence: 1 }, total: { value: "1", page: 1, quote: "TOTAL: 1.00", confidence: 1 } }, items: [] };
+  const transcription = "INVOICE\nINVOICE NO: INV-2026-0042\nTOTAL: 2420.00\nGROSS WEIGHT: 11220 KG";
+  const reply = { transcription, fields: {
+    number: { value: "INV-2026-0042", page: 1, quote: "INVOICE NO: INV-2026-0042", confidence: 1 },
+    total: { value: "2420.00", page: 1, quote: "TOTAL: 2420.00", confidence: 1 },
+    gross_weight: { value: "11220 KG", page: 1, quote: "GROSS WEIGHT: 11220 KG", confidence: 1 },
+    currency: { value: "USD", page: 1, quote: "CURRENCY: USD", confidence: 1 }, // строки нет в расшифровке
+  }, items: [] };
   const { code, out, calls } = await probeLog([okJson(reply)], true);
   assert.equal(code, 0);
   assert.match(calls[0].messages[1].content[1].image_url.url, /^data:image\/png;base64,/);
-  assert.match(out, /полей 1 из 2/);
+  assert.match(out, /полей 3 из 4/);
   assert.match(out, /PNG \d+×\d+/);
 });
 

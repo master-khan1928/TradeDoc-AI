@@ -133,7 +133,8 @@ export function createApp() {
       if (url.pathname === "/api/letter" && req.method === "POST") {
         const body = await readBody(req);
         if (!Array.isArray(body.findings) || body.findings.length > 20) return send(res, 400, { error: "findings must be an array of up to 20" });
-        return send(res, 200, { text: buildLetter(body.findings, body.lang, body.mode && typeof body.mode === "object" ? body.mode : {}) });
+        const summary = body.summary && typeof body.summary === "object" ? body.summary : null;
+        return send(res, 200, { text: buildLetter(body.findings, body.lang, body.mode && typeof body.mode === "object" ? body.mode : {}, summary) });
       }
       // разбор по шаблону для листов документов на сайте: тот же файл, что у сервера (не копия), только он один
       if (url.pathname === "/shared/mock.js" && req.method === "GET") {

@@ -11,7 +11,7 @@ names of drivers and representatives, contact details, document numbers.
 |---|---|---|
 | TradeDoc AI server | document file and text | only while the request is processed, in memory; never written to disk, a database or logs |
 | Server, demo-mode cache | reading result of a synthetic document by a free model | up to 30 minutes in memory; free-model mode only; no cache for Meta |
-| Your browser (localStorage) | the shipment case: document texts, versions, check history; consent; language | until you delete it: the "Delete all my data" button |
+| Your browser (localStorage) | the shipment case: document texts, versions, check history; a draft of the documents before a check; consent; language | until you delete it: the "Delete all my data" button |
 | External AI provider | document text (personal data masked) or image | under the provider's rules, see below |
 
 **Transfer to external AI providers.** When a model mode is on, the document is sent to the provider (Google,

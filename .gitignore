@@ -1,0 +1,11 @@
+node_modules
+.env
+*.log
+.claude/
+.env.*
+test-results/
+playwright-report/
+bench-results/*.tmp
+docs/screens/
+snapshots/
+*.tar

@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TradeDoc AI</title>
+<meta name="description" content="Check a trade document pack before the truck leaves for the border.">
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<div class="bg" aria-hidden="true"><div class="orb o1"></div><div class="orb o2"></div><div class="grid"></div></div>
+
+<header>
+  <div class="wrap">
+    <div class="bar">
+      <div class="brand"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="url(#g)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#2fd6c3"/><stop offset="1" stop-color="#5b8cff"/></linearGradient></defs><path d="M5 4h10l4 4v12H5z"/><path d="M9 14l2 2 4-5"/></svg></span>TradeDoc AI</div>
+      <span class="badge mock" id="modeBadge"></span>
+      <div class="lang" role="group" aria-label="Language"><button data-lang="ru" aria-pressed="true">RU</button><button data-lang="en" aria-pressed="false">EN</button><button data-lang="kk" aria-pressed="false">KK</button></div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="TradeDoc AI" id="tabs">
+      <button class="tab" role="tab" id="tabbtn-documents" aria-controls="tab-documents" aria-selected="true" tabindex="0" data-tab="documents" data-t="tab_documents"></button>
+      <button class="tab" role="tab" id="tabbtn-check" aria-controls="tab-check" aria-selected="false" tabindex="-1" data-tab="check" data-t="tab_check"></button>
+      <button class="tab" role="tab" id="tabbtn-case" aria-controls="tab-case" aria-selected="false" tabindex="-1" data-tab="case" data-t="tab_case"></button>
+      <button class="tab" role="tab" id="tabbtn-report" aria-controls="tab-report" aria-selected="false" tabindex="-1" data-tab="report" data-t="tab_report"></button>
+    </nav>
+  </div>
+</header>
+
+<div class="strip">
+  <div class="wrap">
+    <div class="strip-in" id="consentBox">
+      <label for="consent"><input type="checkbox" id="consent"> <span data-t="consent_short"></span></label>
+      <p class="note"><span data-t="legal_docs"></span> <span id="legalLinks"></span></p>
+      <p class="note" id="consentHint" role="status"></p>
+      <p class="warn" id="demoBanner" role="alert" hidden></p>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <!-- ДОКУМЕНТЫ -->
+  <section class="tabpanel panel-gap" id="tab-documents" role="tabpanel" aria-labelledby="tabbtn-documents" tabindex="0">
+    <div class="hero">
+      <p class="eyebrow" data-t="eyebrow"></p>
+      <h1><span data-t="h1a"></span> <span class="gt" data-t="h1b"></span></h1>
+      <p class="lead" data-t="lead"></p>
+      <p class="note" id="metaNote"></p>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <h2 id="packTitle" data-t="pack"></h2>
+        <div class="row" id="samples"></div>
+      </div>
+      <div class="card-body panel-gap">
+        <div class="drop" id="drop">
+          <p><span data-t="drop_text"></span><br><span class="note" data-t="drop_note"></span></p>
+          <button class="btn secondary" type="button" id="pickAll" data-t="pick_files"></button>
+          <input type="file" id="fileAll" class="sr" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.txt,application/pdf,image/jpeg,image/png,image/webp,text/plain" tabindex="-1" aria-hidden="true">
+          <div class="status u-full" id="dropStatus" role="status" aria-live="polite"></div>
+        </div>
+        <div class="empty" id="docsEmpty" hidden>
+          <h3 data-t="empty_docs_h"></h3>
+          <p data-t="empty_docs_p"></p>
+          <div class="row">
+            <button class="btn primary" type="button" id="loadPack" data-t="load_pack"></button>
+            <button class="btn secondary" type="button" id="demoPack" data-t="demo_pack"></button>
+          </div>
+        </div>
+        <div class="sheets">
+          <article class="sheet" data-doc="invoice">
+            <div class="sheet-head">
+              <div><h3 id="h-invoice" data-t="d_invoice"></h3><div class="sheet-tags"><span class="badge" data-src="invoice"></span><span class="badge quiet" data-size="invoice"></span></div></div>
+              <div class="sheet-actions"><button class="btn secondary sm" type="button" data-pick="invoice" data-t="pick_one"></button><button class="btn secondary sm" type="button" data-clear="invoice" data-t="clear_one"></button><button class="btn text sm" type="button" data-toggle="invoice" aria-expanded="false" aria-controls="raw-invoice"></button></div>
+            </div>
+            <div class="paper" id="sheet-invoice" aria-labelledby="h-invoice"></div>
+            <div class="raw" id="raw-invoice" hidden><label class="sr" for="t-invoice" data-t="raw_label"></label><textarea id="t-invoice" spellcheck="false"></textarea></div>
+            <p class="status" id="s-invoice" role="status" aria-live="polite"></p>
+          </article>
+          <article class="sheet" data-doc="packing">
+            <div class="sheet-head">
+              <div><h3 id="h-packing" data-t="d_packing"></h3><div class="sheet-tags"><span class="badge" data-src="packing"></span><span class="badge quiet" data-size="packing"></span></div></div>
+              <div class="sheet-actions"><button class="btn secondary sm" type="button" data-pick="packing" data-t="pick_one"></button><button class="btn secondary sm" type="button" data-clear="packing" data-t="clear_one"></button><button class="btn text sm" type="button" data-toggle="packing" aria-expanded="false" aria-controls="raw-packing"></button></div>
+            </div>
+            <div class="paper" id="sheet-packing" aria-labelledby="h-packing"></div>
+            <div class="raw" id="raw-packing" hidden><label class="sr" for="t-packing" data-t="raw_label"></label><textarea id="t-packing" spellcheck="false"></textarea></div>
+            <p class="status" id="s-packing" role="status" aria-live="polite"></p>
+          </article>
+          <article class="sheet" data-doc="cmr">
+            <div class="sheet-head">
+              <div><h3 id="h-cmr">CMR</h3><div class="sheet-tags"><span class="badge" data-src="cmr"></span><span class="badge quiet" data-size="cmr"></span></div></div>
+              <div class="sheet-actions"><button class="btn secondary sm" type="button" data-pick="cmr" data-t="pick_one"></button><button class="btn secondary sm" type="button" data-clear="cmr" data-t="clear_one"></button><button class="btn text sm" type="button" data-toggle="cmr" aria-expanded="false" aria-controls="raw-cmr"></button></div>
+            </div>
+            <div class="paper" id="sheet-cmr" aria-labelledby="h-cmr"></div>
+            <div class="raw" id="raw-cmr" hidden><label class="sr" for="t-cmr" data-t="raw_label"></label><textarea id="t-cmr" spellcheck="false"></textarea></div>
+            <p class="status" id="s-cmr" role="status" aria-live="polite"></p>
+          </article>
+          <input type="file" id="fileOne" class="sr" accept=".pdf,.jpg,.jpeg,.png,.webp,.txt,application/pdf,image/jpeg,image/png,image/webp,text/plain" tabindex="-1" aria-hidden="true">
+        </div>
+        <div class="row">
+          <button class="btn primary" id="run" data-t="run"></button>
+          <span class="note" data-t="edit_hint"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ПРОВЕРКА -->
+  <section class="tabpanel panel-gap" id="tab-check" role="tabpanel" aria-labelledby="tabbtn-check" tabindex="0" hidden>
+    <div class="empty" id="checkEmpty">
+      <h3 data-t="empty_check_h"></h3>
+      <p data-t="empty_check_p"></p>
+      <button class="btn primary" type="button" id="goDocs" data-t="go_docs"></button>
+    </div>
+    <div id="out" class="panel-gap" hidden>
+      <section class="card" id="scoreBox" aria-live="polite">
+        <div class="card-head"><h2 data-t="passed_label"></h2><p class="note" id="aiMark"></p></div>
+        <div class="card-body panel-gap">
+          <div class="stats">
+            <div class="stat found"><span><i class="ic" aria-hidden="true">!</i><span data-t="st_found"></span></span><b id="statFound">0</b></div>
+            <div class="stat review"><span><i class="ic" aria-hidden="true">?</i><span data-t="st_review"></span></span><b id="statReview">0</b></div>
+            <div class="stat ok"><span><i class="ic" aria-hidden="true">✓</i><span data-t="st_notfound"></span></span><b id="statOk">0</b></div>
+          </div>
+          <p class="note" id="scoreLegend"></p>
+          <dl class="meta" id="runMeta"></dl>
+          <div class="chips" id="diff"></div>
+          <div class="row">
+            <label class="sr" for="fixType" data-t="fix_type"></label>
+            <select id="fixType" class="btn secondary sm"><option value="invoice"></option><option value="packing"></option><option value="cmr">CMR</option></select>
+            <button class="btn secondary sm" type="button" id="fixBtn" data-t="fix_btn"></button>
+          </div>
+        </div>
+      </section>
+      <div class="cols">
+        <div class="stack">
+          <section class="card group found"><div class="card-head"><h2><i class="ic" aria-hidden="true">!</i><span data-t="g_found"></span> <span id="cntFound"></span></h2></div><div class="card-body"><div class="stack" id="findings"></div><p class="note" data-t="disclaimer_short"></p></div></section>
+          <section class="card group review"><div class="card-head"><h2><i class="ic" aria-hidden="true">?</i><span data-t="g_review"></span> <span id="cntReview"></span></h2></div><div class="card-body"><div class="stack" id="reviewList"></div></div></section>
+          <section class="card group ok"><div class="card-head"><h2><i class="ic" aria-hidden="true">✓</i><span data-t="g_ok"></span> <span id="cntOk"></span></h2></div><div class="card-body"><ul class="pass-list" id="passedList"></ul></div></section>
+        </div>
+        <div class="stack">
+          <section class="card"><div class="card-head"><h2 data-t="inspector"></h2></div><div class="card-body"><div class="stack" id="inspector"></div><p class="note u-mt12" id="inspNote"></p></div></section>
+          <section class="card"><div class="card-head"><h2 data-t="all_checks"></h2></div><div class="card-body"><ul class="checks" id="checks"></ul></div></section>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ДЕЛО ГРУЗА -->
+  <section class="tabpanel panel-gap" id="tab-case" role="tabpanel" aria-labelledby="tabbtn-case" tabindex="0" hidden>
+    <div class="card" id="casePanel">
+      <div class="card-head">
+        <h2 id="caseH" data-t="case_h"></h2>
+        <div class="row">
+          <label class="sr" for="caseSel" data-t="case_pick"></label>
+          <select id="caseSel" class="btn secondary sm"></select>
+          <button class="btn secondary sm" type="button" id="caseNew" data-t="case_new"></button>
+          <button class="btn secondary sm" type="button" id="caseDel" data-t="case_del"></button>
+          <button class="btn text sm" type="button" id="caseWipe" data-t="case_wipe"></button>
+        </div>
+      </div>
+      <div class="card-body panel-gap">
+        <div class="caseform">
+          <label class="field"><span data-t="case_name"></span><input id="caseName" maxlength="120" autocomplete="off"></label>
+          <label class="field"><span data-t="case_dep"></span><input id="caseDep" type="date"><small class="hint" data-t="date_hint"></small></label>
+          <span class="badge" id="caseDue" hidden></span>
+        </div>
+        <div class="cols2">
+          <div><h3 class="sub" data-t="case_docs"></h3><div id="caseDocs" class="stack"></div></div>
+          <div><h3 class="sub" data-t="case_hist"></h3><ol id="caseHist" class="hist" reversed></ol></div>
+        </div>
+        <div id="docDiff" class="diffbox" role="region" aria-live="polite" hidden></div>
+        <p class="note" data-t="case_note"></p>
+        <p class="warn" id="caseWarn" role="alert" hidden></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ОТЧЁТ -->
+  <section class="tabpanel panel-gap" id="tab-report" role="tabpanel" aria-labelledby="tabbtn-report" tabindex="0" hidden>
+    <div class="empty" id="reportEmpty">
+      <h3 data-t="empty_report_h"></h3>
+      <p data-t="empty_check_p"></p>
+      <button class="btn primary" type="button" id="goDocs2" data-t="go_docs"></button>
+    </div>
+    <div id="reportBody" class="panel-gap" hidden>
+      <section class="card">
+        <div class="card-head"><h2 data-t="tab_report"></h2><button class="btn primary" type="button" id="printBtn" data-t="print_btn"></button></div>
+        <div class="card-body panel-gap"><p class="note" data-t="report_note"></p><dl class="meta" id="reportMeta"></dl></div>
+      </section>
+      <section class="card">
+        <div class="card-head"><h2 data-t="letter_h"></h2>
+          <div class="row">
+            <select id="letterLang" class="btn secondary sm" aria-label="Letter language"><option value="ru">Русский</option><option value="en">English</option></select>
+            <button class="btn secondary sm" id="mkLetter" data-t="mk_letter"></button>
+            <button class="btn secondary sm" id="copyLetter" hidden data-t="copy"></button>
+          </div>
+        </div>
+        <div class="card-body panel-gap"><div class="letter" id="letter" hidden></div><p class="note" data-t="letter_note"></p></div>
+      </section>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <p data-t="disclaimer"></p>
+  <p class="warn" id="kkNote" hidden></p>
+  <p data-t="reading_note"></p>
+</footer>
+
+<div id="printReport"></div>
+
+<script type="module" src="/app.js"></script>
+</body>
+</html>

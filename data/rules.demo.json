@@ -1,0 +1,22 @@
+[
+  { "id": "R-DEMO-01", "checks": ["party_buyer"], "demo": true, "status": "needs_review", "source_url": null, "checked_on": null,
+    "q": { "ru": "Почему название получателя записано по-разному в разных документах? Это одна и та же компания?", "en": "Why is the consignee name written differently in different documents? Is it the same company?" } },
+  { "id": "R-DEMO-02", "checks": ["party_seller"], "demo": true, "status": "needs_review", "source_url": null, "checked_on": null,
+    "q": { "ru": "Почему название отправителя отличается между документами? Подтвердите, что это один и тот же отправитель.", "en": "Why does the sender name differ between documents? Please confirm it is the same sender." } },
+  { "id": "R-DEMO-03", "checks": ["gross_weight"], "demo": true, "status": "needs_review", "source_url": null, "checked_on": null,
+    "q": { "ru": "Вес брутто в документах различается. Какой вес подтверждён по факту погрузки?", "en": "Gross weight differs between documents. Which weight is confirmed by the actual loading?" } },
+  { "id": "R-DEMO-04", "checks": ["net_weight", "net_le_gross"], "demo": true, "status": "needs_review", "source_url": null, "checked_on": null,
+    "q": { "ru": "Вес нетто не сходится или превышает брутто. Чем это объясняется?", "en": "Net weight does not match or is above gross. What explains it?" } },
+  { "id": "R-DEMO-05", "checks": ["packages"], "demo": true, "status": "needs_review", "source_url": null, "checked_on": null,
+    "q": { "ru": "Количество мест в документах разное. Сколько мест реально погружено?", "en": "The number of packages differs between documents. How many packages were actually loaded?" } },
+  { "id": "R-DEMO-06", "checks": ["hs_match", "hs_format"], "demo": true, "status": "needs_review", "source_url": null, "checked_on": null,
+    "q": { "ru": "Код ТН ВЭД различается или записан в неверном формате. По какому коду оформляется товар?", "en": "The HS code differs or has a wrong format. Under which code is the goods cleared?" } },
+  { "id": "R-DEMO-07", "checks": ["date_order"], "demo": true, "status": "needs_review", "source_url": null, "checked_on": null,
+    "q": { "ru": "Дата документа позже даты отгрузки. Какая дата верная?", "en": "A document date is later than the shipment date. Which date is correct?" } },
+  { "id": "R-DEMO-08", "checks": ["reference"], "demo": true, "status": "needs_review", "source_url": null, "checked_on": null,
+    "q": { "ru": "Ссылка на инвойс в документе не совпадает с номером инвойса. К какому счёту относится груз?", "en": "The invoice reference does not match the invoice number. Which invoice does this cargo belong to?" } },
+  { "id": "R-DEMO-09", "checks": ["line_totals", "invoice_sum"], "demo": true, "status": "needs_review", "source_url": null, "checked_on": null,
+    "q": { "ru": "Суммы в счёте не сходятся. Какая сумма указана верно?", "en": "The amounts in the invoice do not add up. Which amount is correct?" } },
+  { "id": "R-DEMO-10", "checks": ["item_qty"], "demo": true, "status": "needs_review", "source_url": null, "checked_on": null,
+    "q": { "ru": "Количество товара по строкам различается между счётом и упаковочным листом. Какое количество отгружено?", "en": "Line quantities differ between the invoice and the packing list. What quantity was shipped?" } }
+]

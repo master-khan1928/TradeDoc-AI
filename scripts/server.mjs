@@ -91,7 +91,11 @@ function readBody(req) {
     });
     req.on("end", () => {
       if (tooLarge) return reject(Object.assign(new Error("too large"), { code: 413 }));
-      try { resolve(JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}")); } catch { reject(Object.assign(new Error("bad json"), { code: 400 })); }
+      let v;
+      try { v = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}"); } catch { return reject(Object.assign(new Error("bad json"), { code: 400 })); }
+      // верхний уровень только объект: null, массив, число или строка это ошибка клиента (400), а не сервера
+      if (!v || typeof v !== "object" || Array.isArray(v)) return reject(Object.assign(new Error("bad shape"), { code: 400 }));
+      resolve(v);
     });
     req.on("error", reject);
   });
@@ -100,6 +104,9 @@ function readBody(req) {
 export function createApp() {
   const server = createServer(async (req, res) => {
     currentReq = req;
+    // один контекст отмены на запрос: клиент закрыл соединение до ответа — запросы к модели и повторы прекращаются
+    const ac = new AbortController();
+    res.on("close", () => { if (!res.writableFinished) ac.abort(); });
     try {
       const url = new URL(req.url, "http://x");
       if (url.pathname === "/healthz") return send(res, 200, "ok", "text/plain");
@@ -116,12 +123,12 @@ export function createApp() {
         const body = await readBody(req);
         const err = validateDocs(body.docs);
         if (err) return send(res, 400, { error: err });
-        return send(res, 200, await checkPack(body.docs));
+        return send(res, 200, await checkPack(body.docs, { signal: ac.signal }));
       }
       if (url.pathname === "/api/read" && req.method === "POST") {
         // один файл на запрос, сырым телом (без base64): тип документа можно передать в ?type=
         const buf = await readRaw(req, MAX_FILE_BYTES);
-        return send(res, 200, await readUpload({ buf, type: url.searchParams.get("type") }));
+        return send(res, 200, await readUpload({ buf, type: url.searchParams.get("type") }, { signal: ac.signal }));
       }
       if (url.pathname === "/api/letter" && req.method === "POST") {
         const body = await readBody(req);
@@ -152,6 +159,7 @@ export function createApp() {
         return send(res, 404, { error: "not found" });
       }
     } catch (e) {
+      if (e?.kind === "cancelled" || ac.signal.aborted) return; // клиента уже нет, отвечать некому
       if (e instanceof InputError) return send(res, e.status, { error: e.message, code: e.code, ...(e.reason ? { reason: e.reason } : {}), ...(e.markers ? { markers: e.markers } : {}), ...(e.afterSend ? { afterSend: true } : {}) });
       // наружу только код ошибки: без стека, путей и текста исключения
       send(res, e.code === 413 ? 413 : e.code === 400 ? 400 : 500, { error: e.code === 413 ? "request too large" : e.code === 400 ? "bad request" : "server error", code: e.code === 413 ? "body_too_large" : e.code === 400 ? "bad_request" : "server_error" });

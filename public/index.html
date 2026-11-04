@@ -5,793 +5,210 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>TradeDoc AI</title>
 <meta name="description" content="Check a trade document pack before the truck leaves for the border.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap">
-<style>
-:root{
-  --bg:#050608; --fg:#fff; --fg2:rgba(255,255,255,.70); --fg3:rgba(255,255,255,.58);
-  --glass:rgba(255,255,255,.05); --line:rgba(255,255,255,.11); --line2:rgba(255,255,255,.22);
-  --teal:#2fd6c3; --blue:#5b8cff; --gold:#f5b301; --green:#3ddc84; --red:#ff5d6c; --orange:#ff8a4c;
-  --grad:linear-gradient(115deg,var(--teal),var(--blue));
-  --font:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --ease:cubic-bezier(.16,1,.3,1); --r:18px;
-  color-scheme:dark;
-}
-*{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--fg);font:400 1rem/1.6 var(--font);-webkit-font-smoothing:antialiased;overflow-x:hidden}
-button,textarea,select{font:inherit;color:inherit}
-button{cursor:pointer;background:none;border:0;padding:0}
-h1,h2,h3,p{margin:0}
-:focus-visible{outline:2px solid var(--teal);outline-offset:3px;border-radius:8px}
-.wrap{max-width:1120px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left))}
-.bg{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
-.orb{position:absolute;border-radius:50%;filter:blur(90px);will-change:transform}
-.o1{width:60vmax;height:60vmax;left:-24vmax;top:-28vmax;background:radial-gradient(circle,var(--teal),transparent 62%);opacity:.20;animation:d1 28s var(--ease) infinite alternate}
-.o2{width:52vmax;height:52vmax;right:-22vmax;top:20vh;background:radial-gradient(circle,var(--blue),transparent 62%);opacity:.17;animation:d2 34s var(--ease) infinite alternate}
-.grid{position:absolute;inset:0;opacity:.5;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:64px 64px;-webkit-mask-image:radial-gradient(80% 60% at 50% 15%,#000 20%,transparent 75%);mask-image:radial-gradient(80% 60% at 50% 15%,#000 20%,transparent 75%)}
-@keyframes d1{to{transform:translate(12vw,10vh) scale(1.1)}}
-@keyframes d2{to{transform:translate(-10vw,14vh) scale(.92)}}
-
-header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,rgba(5,6,8,.92),rgba(5,6,8,.5) 75%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-.bar{display:flex;align-items:center;gap:10px;padding:14px 0}
-.brand{display:flex;align-items:center;gap:10px;margin-right:auto;font-weight:600;letter-spacing:-.02em}
-.mark{width:30px;height:30px;border-radius:9px;background:#0b0d10;border:1px solid var(--line);display:grid;place-items:center}
-.mark svg{width:18px;height:18px}
-.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:.75rem;font-weight:500;line-height:1.4;border:1px solid var(--line);background:var(--glass);color:var(--fg2);white-space:nowrap}
-.badge.demo{color:var(--gold);border-color:rgba(245,179,1,.38);background:rgba(245,179,1,.08)}
-.badge.ok{color:var(--green);border-color:rgba(61,220,132,.38);background:rgba(61,220,132,.08)}
-.badge.high{color:var(--red);border-color:rgba(255,93,108,.45);background:rgba(255,93,108,.09)}
-.badge.medium{color:var(--orange);border-color:rgba(255,138,76,.45);background:rgba(255,138,76,.10)}
-.badge.ai{color:var(--teal);border-color:rgba(47,214,195,.38);background:rgba(47,214,195,.08)}
-.lang{display:inline-flex;padding:3px;border-radius:999px;background:var(--glass);border:1px solid var(--line)}
-.lang button{min-width:40px;padding:5px 10px;border-radius:999px;font-size:.75rem;font-weight:600;color:var(--fg3)}
-.lang button[aria-pressed=true]{background:#fff;color:#000}
-
-.hero{padding:clamp(24px,5vw,64px) 0 28px;display:grid;gap:18px}
-.eyebrow{font-size:.75rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--fg3)}
-h1{font-size:clamp(2.1rem,1.2rem + 4.6vw,4.4rem);font-weight:500;letter-spacing:-.045em;line-height:1.02;max-width:16ch;text-wrap:balance}
-.gt{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-.lead{color:var(--fg2);max-width:62ch}
-
-.glass{position:relative;border-radius:var(--r);background:linear-gradient(180deg,rgba(255,255,255,.065),rgba(255,255,255,.025));border:1px solid var(--line);backdrop-filter:blur(16px) saturate(1.2);-webkit-backdrop-filter:blur(16px) saturate(1.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 30px 80px -40px rgba(0,0,0,.9)}
-.panel{padding:clamp(16px,3vw,26px)}
-.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 20px;border-radius:999px;font-weight:500;transition:transform .28s var(--ease),box-shadow .28s var(--ease),background .28s}
-.btn:active{transform:scale(.98)}
-.btn.primary{color:#04100e;background:var(--grad);box-shadow:0 0 0 1px rgba(255,255,255,.12) inset,0 10px 40px -12px rgba(47,214,195,.6)}
-.btn.primary:hover{box-shadow:0 0 0 1px rgba(255,255,255,.18) inset,0 10px 50px -8px rgba(91,140,255,.75)}
-.btn.ghost{background:var(--glass);border:1px solid var(--line)}
-.btn.ghost:hover{background:rgba(255,255,255,.09);border-color:var(--line2)}
-.btn.sm{min-height:36px;padding:0 14px;font-size:.875rem}
-.btn[disabled]{opacity:.55;cursor:wait}
-
-.docs{display:grid;gap:14px;margin-top:16px}
-@media(min-width:900px){.docs{grid-template-columns:repeat(3,1fr)}}
-.doc label{display:flex;justify-content:space-between;align-items:center;font-size:.875rem;font-weight:500;margin-bottom:8px}
-textarea{width:100%;min-height:250px;resize:vertical;padding:12px 14px;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid var(--line);font:400 .8125rem/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--fg)}
-textarea::selection{background:rgba(47,214,195,.45);color:#fff}
-textarea:focus{border-color:var(--teal);outline:none}
-
-.score{display:grid;gap:10px}
-.score b{font-size:clamp(2rem,1.4rem + 2.4vw,3rem);font-weight:500;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
-.meter{height:8px;border-radius:999px;background:rgba(255,255,255,.09);overflow:hidden}
-.meter i{display:block;height:100%;width:0;border-radius:inherit;background:var(--grad);box-shadow:0 0 18px rgba(47,214,195,.6);transition:width 1.1s var(--ease)}
-.meter i.bad{background:linear-gradient(115deg,var(--orange),var(--red));box-shadow:0 0 18px rgba(255,93,108,.5)}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.f{padding:16px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid var(--line);display:grid;gap:10px;animation:in .5s var(--ease) both;animation-delay:calc(var(--i,0)*70ms)}
-.f h3{font-size:1rem;font-weight:500;letter-spacing:-.01em}
-.f .d{font-size:.8125rem;color:var(--fg3);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
-.ev{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;text-align:left;padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.28);border:1px solid var(--line);font-size:.8125rem;transition:border-color .2s,background .2s;width:100%}
-.ev:hover{border-color:var(--teal);background:rgba(47,214,195,.07)}
-.ev code{font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--fg);overflow-wrap:anywhere;flex:1 1 220px}
-.ev span{color:var(--fg3);font-size:.75rem}
-@keyframes in{from{opacity:0;transform:translateY(14px)}}
-.q{padding:12px 14px;border-left:2px solid var(--teal);background:rgba(47,214,195,.05);border-radius:0 12px 12px 0;display:grid;gap:6px}
-.q small{color:var(--fg3)}
-.sk{display:block;height:14px;border-radius:8px;background:linear-gradient(90deg,rgba(255,255,255,.05),rgba(255,255,255,.12),rgba(255,255,255,.05));background-size:220% 100%;animation:sh 1.3s linear infinite}
-@keyframes sh{from{background-position:120% 0}to{background-position:-120% 0}}
-.stack{display:grid;gap:12px}
-.cols{display:grid;gap:16px;margin-top:16px}
-@media(min-width:900px){.cols{grid-template-columns:1.25fr .75fr;align-items:start}}
-h2{font-size:1.25rem;font-weight:500;letter-spacing:-.02em;margin-bottom:12px}
-.checks{display:grid;gap:6px;margin:0;padding:0;list-style:none;font-size:.875rem}
-.checks li{display:flex;gap:10px;align-items:center;color:var(--fg2)}
-.checks i{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:.7rem;flex:none}
-.checks .pass i{background:rgba(61,220,132,.16);color:var(--green)}
-.checks .fail i{background:rgba(255,93,108,.16);color:var(--red)}
-.checks .skip i{background:rgba(255,255,255,.08);color:var(--fg3)}
-.letter{white-space:pre-wrap;padding:14px;border-radius:12px;background:rgba(0,0,0,.35);border:1px solid var(--line);font-size:.875rem;line-height:1.6;max-height:340px;overflow:auto}
-.note{font-size:.8125rem;color:var(--fg3)}
-.warn{padding:10px 14px;border-radius:12px;background:rgba(245,179,1,.08);border:1px solid rgba(245,179,1,.35);color:#ffd36a;font-size:.875rem}
-.drop{margin-top:16px;padding:18px;border-radius:14px;border:1.5px dashed var(--line2);background:rgba(0,0,0,.2);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;transition:border-color .2s,background .2s}
-.drop.over,.doc.over textarea{border-color:var(--teal);background:rgba(47,214,195,.07)}
-.drop p{color:var(--fg2);font-size:.875rem}
-.status{min-height:1.2em;font-size:.8125rem;color:var(--fg3);margin-top:6px;overflow-wrap:anywhere}
-.status.bad{color:#ffb3ba}
-.status.photo{color:#ffd36a}
-.doc .tools{display:flex;gap:8px;align-items:center}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.ev .ph{color:#ffd36a;font-size:.75rem;flex-basis:100%}
-footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));margin-top:40px;border-top:1px solid var(--line);color:var(--fg3);font-size:.8125rem;display:grid;gap:8px}
-.caseform{display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin-top:14px}
-.caseform label{display:grid;gap:4px;font-size:.8125rem;color:var(--fg2)}
-.caseform input{min-height:40px;padding:6px 12px;border-radius:12px;background:rgba(0,0,0,.35);border:1px solid var(--line);color:var(--fg);font:inherit;color-scheme:dark}
-.caseform input:focus{border-color:var(--teal);outline:none}
-select option{color:#000;background:#fff}
-.cols2{display:grid;gap:16px;margin-top:16px}
-@media(min-width:900px){.cols2{grid-template-columns:1fr 1fr}}
-h3.sub{font-size:.875rem;font-weight:500;color:var(--fg2);margin-bottom:8px}
-.vrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.8125rem;color:var(--fg2)}
-.vrow b{font-weight:500;color:var(--fg);min-width:9ch}
-.vchip{min-height:32px;padding:0 10px;border-radius:999px;border:1px solid var(--line);background:var(--glass);font-size:.75rem}
-.vchip[aria-current=true]{border-color:var(--teal);color:var(--teal)}
-.hist{margin:0;padding-left:20px;display:grid;gap:8px;font-size:.8125rem;color:var(--fg2)}
-.hist .ok{color:var(--green)} .hist .bad{color:#ffb3ba}
-.diffbox{margin-top:14px;padding:12px 14px;border-radius:12px;background:rgba(0,0,0,.35);border:1px solid var(--line);font:400 .8125rem/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;max-height:320px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}
-.diffbox .add{color:var(--green)} .diffbox .del{color:#ffb3ba;text-decoration:line-through}
-#printReport{display:none}
-@media print{
-  @page{margin:16mm}
-  html,body{background:#fff!important;color:#000!important}
-  body>*:not(#printReport){display:none!important}
-  #printReport{display:block!important;font:10.5pt/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#000}
-  #printReport h1{font-size:16pt;margin:0 0 6pt}
-  #printReport h2{font-size:12pt;margin:12pt 0 4pt;border-bottom:1px solid #999;padding-bottom:2pt}
-  #printReport .pf{break-inside:avoid;margin:6pt 0}
-  #printReport .q{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9.5pt;margin-left:10pt}
-  #printReport .muted{color:#444;font-size:9pt}
-}
-[hidden]{display:none!important}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;animation-iteration-count:1!important;transition-duration:1ms!important}.orb{animation:none!important}}
-</style>
+<link rel="stylesheet" href="/app.css">
 </head>
 <body>
-<div class="bg" aria-hidden="true"><div class="orb o1"></div><div class="orb o2"></div><div class="grid"></div></div>
 
 <header>
-  <div class="wrap bar">
-    <div class="brand"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="url(#g)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="g" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#2fd6c3"/><stop offset="1" stop-color="#5b8cff"/></linearGradient></defs><path d="M5 4h10l4 4v12H5z"/><path d="M9 14l2 2 4-5"/></svg></span>TradeDoc AI</div>
-    <span class="badge demo" id="modeBadge"></span>
-    <div class="lang" role="group" aria-label="Language"><button data-lang="ru" aria-pressed="true">RU</button><button data-lang="en" aria-pressed="false">EN</button></div>
+  <div class="wrap">
+    <div class="bar">
+      <div class="brand"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h10l4 4v12H5z"/><path d="M9 14l2 2 4-5"/></svg></span>TradeDoc AI</div>
+      <span class="badge mock" id="modeBadge"></span>
+      <div class="lang" role="group" aria-label="Language"><button data-lang="ru" aria-pressed="true">RU</button><button data-lang="en" aria-pressed="false">EN</button><button data-lang="kk" aria-pressed="false">KK</button></div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="TradeDoc AI" id="tabs">
+      <button class="tab" role="tab" id="tabbtn-documents" aria-controls="tab-documents" aria-selected="true" tabindex="0" data-tab="documents" data-t="tab_documents"></button>
+      <button class="tab" role="tab" id="tabbtn-check" aria-controls="tab-check" aria-selected="false" tabindex="-1" data-tab="check" data-t="tab_check"></button>
+      <button class="tab" role="tab" id="tabbtn-case" aria-controls="tab-case" aria-selected="false" tabindex="-1" data-tab="case" data-t="tab_case"></button>
+      <button class="tab" role="tab" id="tabbtn-report" aria-controls="tab-report" aria-selected="false" tabindex="-1" data-tab="report" data-t="tab_report"></button>
+    </nav>
   </div>
 </header>
 
-<main class="wrap">
-  <section class="hero">
-    <p class="eyebrow" data-t="eyebrow"></p>
-    <h1><span data-t="h1a"></span> <span class="gt" data-t="h1b"></span></h1>
-    <p class="lead" data-t="lead"></p>
-  </section>
-
-  <section class="glass panel" id="casePanel" aria-labelledby="caseH" style="margin-bottom:16px">
-    <div class="row" style="justify-content:space-between">
-      <h2 id="caseH" style="margin:0" data-t="case_h"></h2>
-      <div class="row">
-        <label class="sr" for="caseSel" data-t="case_pick"></label>
-        <select id="caseSel" class="btn ghost sm"></select>
-        <button class="btn ghost sm" type="button" id="caseNew" data-t="case_new"></button>
-        <button class="btn ghost sm" type="button" id="caseDel" data-t="case_del"></button>
-        <button class="btn ghost sm" type="button" id="caseWipe" data-t="case_wipe"></button>
-      </div>
-    </div>
-    <div class="caseform">
-      <label><span data-t="case_name"></span><input id="caseName" maxlength="120" autocomplete="off"></label>
-      <label><span data-t="case_dep"></span><input id="caseDep" type="date"></label>
-      <span class="badge" id="caseDue" hidden></span>
-    </div>
-    <div class="cols2">
-      <div><h3 class="sub" data-t="case_docs"></h3><div id="caseDocs" class="stack" style="gap:8px"></div></div>
-      <div><h3 class="sub" data-t="case_hist"></h3><ol id="caseHist" class="hist" reversed></ol></div>
-    </div>
-    <div id="docDiff" class="diffbox" role="region" aria-live="polite" hidden></div>
-    <p class="note" style="margin-top:12px" data-t="case_note"></p>
-    <p class="warn" id="caseWarn" role="alert" hidden></p>
-  </section>
-
-  <section class="glass panel" aria-labelledby="packTitle">
-    <div class="row" style="justify-content:space-between">
-      <h2 id="packTitle" style="margin:0" data-t="pack"></h2>
-      <div class="row" id="samples"></div>
-    </div>
-    <div class="drop" id="drop">
-      <p><span data-t="drop_text"></span><br><span class="note" data-t="drop_note"></span></p>
-      <button class="btn ghost sm" type="button" id="pickAll" data-t="pick_files"></button>
-      <input type="file" id="fileAll" class="sr" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.txt,application/pdf,image/jpeg,image/png,image/webp,text/plain" tabindex="-1" aria-hidden="true">
-      <div class="status" id="dropStatus" role="status" aria-live="polite" style="flex-basis:100%;margin:0"></div>
-    </div>
-    <div class="docs">
-      <div class="doc" data-doc="invoice"><label for="t-invoice"><span data-t="d_invoice"></span><span class="tools"><span class="badge" data-src="invoice" data-t="synthetic"></span><button class="btn ghost sm" type="button" data-pick="invoice" data-t="pick_one"></button></span></label><textarea id="t-invoice" spellcheck="false"></textarea><p class="status" id="s-invoice" role="status" aria-live="polite"></p></div>
-      <div class="doc" data-doc="packing"><label for="t-packing"><span data-t="d_packing"></span><span class="tools"><span class="badge" data-src="packing" data-t="synthetic"></span><button class="btn ghost sm" type="button" data-pick="packing" data-t="pick_one"></button></span></label><textarea id="t-packing" spellcheck="false"></textarea><p class="status" id="s-packing" role="status" aria-live="polite"></p></div>
-      <div class="doc" data-doc="cmr"><label for="t-cmr"><span>CMR</span><span class="tools"><span class="badge" data-src="cmr" data-t="synthetic"></span><button class="btn ghost sm" type="button" data-pick="cmr" data-t="pick_one"></button></span></label><textarea id="t-cmr" spellcheck="false"></textarea><p class="status" id="s-cmr" role="status" aria-live="polite"></p></div>
-      <input type="file" id="fileOne" class="sr" accept=".pdf,.jpg,.jpeg,.png,.webp,.txt,application/pdf,image/jpeg,image/png,image/webp,text/plain" tabindex="-1" aria-hidden="true">
-    </div>
-    <div class="row" style="margin-top:16px">
-      <button class="btn primary" id="run" data-t="run"></button>
-      <span class="note" data-t="edit_hint"></span>
-    </div>
-  </section>
-
-  <div id="out" hidden>
-    <div class="cols">
-      <div class="stack">
-        <section class="glass panel" id="scoreBox" aria-live="polite">
-          <div class="score">
-            <p class="eyebrow" data-t="passed_label"></p>
-            <b id="scoreNum">0 / 0</b>
-            <div class="meter"><i id="scoreBar"></i></div>
-            <div class="chips" id="diff"></div>
-            <div class="row">
-              <label class="sr" for="fixType" data-t="fix_type"></label>
-              <select id="fixType" class="btn ghost sm"><option value="invoice"></option><option value="packing"></option><option value="cmr">CMR</option></select>
-              <button class="btn ghost sm" type="button" id="fixBtn" data-t="fix_btn"></button>
-              <button class="btn ghost sm" type="button" id="printBtn" data-t="print_btn"></button>
-            </div>
-          </div>
-        </section>
-        <section class="glass panel"><h2 data-t="findings"></h2><div class="stack" id="findings"></div></section>
-        <section class="glass panel"><h2 data-t="letter_h"></h2>
-          <div class="row" style="margin-bottom:12px">
-            <select id="letterLang" class="btn ghost sm" aria-label="Letter language"><option value="ru">Русский</option><option value="en">English</option></select>
-            <button class="btn ghost sm" id="mkLetter" data-t="mk_letter"></button>
-            <button class="btn ghost sm" id="copyLetter" hidden data-t="copy"></button>
-          </div>
-          <div class="letter" id="letter" hidden></div>
-          <p class="note" data-t="letter_note"></p>
-        </section>
-      </div>
-      <div class="stack">
-        <section class="glass panel"><h2 data-t="inspector"></h2><div class="stack" id="inspector"></div><p class="note" id="inspNote" style="margin-top:10px"></p></section>
-        <section class="glass panel"><h2 data-t="all_checks"></h2><ul class="checks" id="checks"></ul></section>
-      </div>
+<div class="strip">
+  <div class="wrap">
+    <div class="strip-in" id="consentBox">
+      <label for="consent"><input type="checkbox" id="consent"> <span data-t="consent_short"></span></label>
+      <p class="note"><span data-t="legal_docs"></span> <span id="legalLinks"></span></p>
+      <p class="note" id="consentHint" role="status"></p>
+      <p class="warn" id="demoBanner" role="alert" hidden></p>
     </div>
   </div>
+</div>
+
+<main class="wrap">
+
+  <!-- ДОКУМЕНТЫ -->
+  <section class="tabpanel panel-gap" id="tab-documents" role="tabpanel" aria-labelledby="tabbtn-documents" tabindex="0">
+    <div class="hero">
+      <p class="eyebrow" data-t="eyebrow"></p>
+      <h1><span data-t="h1a"></span> <span class="gt" data-t="h1b"></span></h1>
+      <p class="lead" data-t="lead"></p>
+      <p class="note" id="metaNote"></p>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <h2 id="packTitle" data-t="pack"></h2>
+        <div class="row" id="samples"></div>
+      </div>
+      <div class="card-body panel-gap">
+        <div class="drop" id="drop">
+          <p><span data-t="drop_text"></span><br><span class="note" data-t="drop_note"></span></p>
+          <button class="btn secondary" type="button" id="pickAll" data-t="pick_files"></button>
+          <input type="file" id="fileAll" class="sr" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.txt,application/pdf,image/jpeg,image/png,image/webp,text/plain" tabindex="-1" aria-hidden="true">
+          <div class="status u-full" id="dropStatus" role="status" aria-live="polite"></div>
+        </div>
+        <div class="empty" id="docsEmpty" hidden>
+          <h3 data-t="empty_docs_h"></h3>
+          <p data-t="empty_docs_p"></p>
+          <div class="row">
+            <button class="btn primary" type="button" id="loadPack" data-t="load_pack"></button>
+            <button class="btn secondary" type="button" id="demoPack" data-t="demo_pack"></button>
+          </div>
+        </div>
+        <div class="sheets">
+          <article class="sheet" data-doc="invoice">
+            <div class="sheet-head">
+              <div><h3 id="h-invoice" data-t="d_invoice"></h3><div class="sheet-tags"><span class="badge" data-src="invoice"></span><span class="badge quiet" data-size="invoice"></span></div></div>
+              <div class="sheet-actions"><button class="btn secondary sm" type="button" data-pick="invoice" data-t="pick_one"></button><button class="btn secondary sm" type="button" data-clear="invoice" data-t="clear_one"></button><button class="btn text sm" type="button" data-toggle="invoice" aria-expanded="false" aria-controls="raw-invoice"></button></div>
+            </div>
+            <div class="paper" id="sheet-invoice" aria-labelledby="h-invoice"></div>
+            <div class="raw" id="raw-invoice" hidden><label class="sr" for="t-invoice" data-t="raw_label"></label><textarea id="t-invoice" spellcheck="false"></textarea></div>
+            <p class="status" id="s-invoice" role="status" aria-live="polite"></p>
+          </article>
+          <article class="sheet" data-doc="packing">
+            <div class="sheet-head">
+              <div><h3 id="h-packing" data-t="d_packing"></h3><div class="sheet-tags"><span class="badge" data-src="packing"></span><span class="badge quiet" data-size="packing"></span></div></div>
+              <div class="sheet-actions"><button class="btn secondary sm" type="button" data-pick="packing" data-t="pick_one"></button><button class="btn secondary sm" type="button" data-clear="packing" data-t="clear_one"></button><button class="btn text sm" type="button" data-toggle="packing" aria-expanded="false" aria-controls="raw-packing"></button></div>
+            </div>
+            <div class="paper" id="sheet-packing" aria-labelledby="h-packing"></div>
+            <div class="raw" id="raw-packing" hidden><label class="sr" for="t-packing" data-t="raw_label"></label><textarea id="t-packing" spellcheck="false"></textarea></div>
+            <p class="status" id="s-packing" role="status" aria-live="polite"></p>
+          </article>
+          <article class="sheet" data-doc="cmr">
+            <div class="sheet-head">
+              <div><h3 id="h-cmr">CMR</h3><div class="sheet-tags"><span class="badge" data-src="cmr"></span><span class="badge quiet" data-size="cmr"></span></div></div>
+              <div class="sheet-actions"><button class="btn secondary sm" type="button" data-pick="cmr" data-t="pick_one"></button><button class="btn secondary sm" type="button" data-clear="cmr" data-t="clear_one"></button><button class="btn text sm" type="button" data-toggle="cmr" aria-expanded="false" aria-controls="raw-cmr"></button></div>
+            </div>
+            <div class="paper" id="sheet-cmr" aria-labelledby="h-cmr"></div>
+            <div class="raw" id="raw-cmr" hidden><label class="sr" for="t-cmr" data-t="raw_label"></label><textarea id="t-cmr" spellcheck="false"></textarea></div>
+            <p class="status" id="s-cmr" role="status" aria-live="polite"></p>
+          </article>
+          <input type="file" id="fileOne" class="sr" accept=".pdf,.jpg,.jpeg,.png,.webp,.txt,application/pdf,image/jpeg,image/png,image/webp,text/plain" tabindex="-1" aria-hidden="true">
+        </div>
+        <div class="row">
+          <button class="btn primary" id="run" data-t="run"></button>
+          <span class="note" data-t="edit_hint"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ПРОВЕРКА -->
+  <section class="tabpanel panel-gap" id="tab-check" role="tabpanel" aria-labelledby="tabbtn-check" tabindex="0" hidden>
+    <div class="empty" id="checkEmpty">
+      <h3 data-t="empty_check_h"></h3>
+      <p data-t="empty_check_p"></p>
+      <button class="btn primary" type="button" id="goDocs" data-t="go_docs"></button>
+    </div>
+    <div id="out" class="panel-gap" hidden>
+      <section class="card" id="scoreBox" aria-live="polite">
+        <div class="card-head"><h2 data-t="passed_label"></h2><p class="note" id="aiMark"></p></div>
+        <div class="card-body panel-gap">
+          <div class="stats">
+            <div class="stat found"><span><i class="ic" aria-hidden="true">!</i><span data-t="st_found"></span></span><b id="statFound">0</b></div>
+            <div class="stat review"><span><i class="ic" aria-hidden="true">?</i><span data-t="st_review"></span></span><b id="statReview">0</b></div>
+            <div class="stat ok"><span><i class="ic" aria-hidden="true">✓</i><span data-t="st_notfound"></span></span><b id="statOk">0</b></div>
+          </div>
+          <p class="note" id="scoreLegend"></p>
+          <dl class="meta" id="runMeta"></dl>
+          <div class="chips" id="diff"></div>
+          <div class="row">
+            <label class="sr" for="fixType" data-t="fix_type"></label>
+            <select id="fixType" class="btn secondary sm"><option value="invoice"></option><option value="packing"></option><option value="cmr">CMR</option></select>
+            <button class="btn secondary sm" type="button" id="fixBtn" data-t="fix_btn"></button>
+          </div>
+        </div>
+      </section>
+      <div class="cols">
+        <div class="stack">
+          <section class="card group found"><div class="card-head"><h2><i class="ic" aria-hidden="true">!</i><span data-t="g_found"></span> <span id="cntFound"></span></h2></div><div class="card-body"><div class="stack" id="findings"></div><p class="note" data-t="disclaimer_short"></p></div></section>
+          <section class="card group review"><div class="card-head"><h2><i class="ic" aria-hidden="true">?</i><span data-t="g_review"></span> <span id="cntReview"></span></h2></div><div class="card-body"><div class="stack" id="reviewList"></div></div></section>
+          <section class="card group ok"><div class="card-head"><h2><i class="ic" aria-hidden="true">✓</i><span data-t="g_ok"></span> <span id="cntOk"></span></h2></div><div class="card-body"><ul class="pass-list" id="passedList"></ul></div></section>
+        </div>
+        <div class="stack">
+          <section class="card"><div class="card-head"><h2 data-t="inspector"></h2></div><div class="card-body"><div class="stack" id="inspector"></div><p class="note u-mt12" id="inspNote"></p></div></section>
+          <section class="card"><div class="card-head"><h2 data-t="all_checks"></h2></div><div class="card-body"><ul class="checks" id="checks"></ul></div></section>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ДЕЛО ГРУЗА -->
+  <section class="tabpanel panel-gap" id="tab-case" role="tabpanel" aria-labelledby="tabbtn-case" tabindex="0" hidden>
+    <div class="card" id="casePanel">
+      <div class="card-head">
+        <h2 id="caseH" data-t="case_h"></h2>
+        <div class="row">
+          <label class="sr" for="caseSel" data-t="case_pick"></label>
+          <select id="caseSel" class="btn secondary sm"></select>
+          <button class="btn secondary sm" type="button" id="caseNew" data-t="case_new"></button>
+          <button class="btn secondary sm" type="button" id="caseDel" data-t="case_del"></button>
+          <button class="btn text sm" type="button" id="caseWipe" data-t="case_wipe"></button>
+        </div>
+      </div>
+      <div class="card-body panel-gap">
+        <div class="caseform">
+          <label class="field"><span data-t="case_name"></span><input id="caseName" maxlength="120" autocomplete="off"></label>
+          <label class="field"><span data-t="case_dep"></span><input id="caseDep" type="date"><small class="hint" data-t="date_hint"></small></label>
+          <span class="badge" id="caseDue" hidden></span>
+        </div>
+        <div class="cols2">
+          <div><h3 class="sub" data-t="case_docs"></h3><div id="caseDocs" class="stack"></div></div>
+          <div><h3 class="sub" data-t="case_hist"></h3><ol id="caseHist" class="hist" reversed></ol></div>
+        </div>
+        <div id="docDiff" class="diffbox" role="region" aria-live="polite" hidden></div>
+        <p class="note" data-t="case_note"></p>
+        <p class="warn" id="caseWarn" role="alert" hidden></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ОТЧЁТ -->
+  <section class="tabpanel panel-gap" id="tab-report" role="tabpanel" aria-labelledby="tabbtn-report" tabindex="0" hidden>
+    <div class="empty" id="reportEmpty">
+      <h3 data-t="empty_report_h"></h3>
+      <p data-t="empty_check_p"></p>
+      <button class="btn primary" type="button" id="goDocs2" data-t="go_docs"></button>
+    </div>
+    <div id="reportBody" class="panel-gap" hidden>
+      <section class="card">
+        <div class="card-head"><h2 data-t="tab_report"></h2><button class="btn primary" type="button" id="printBtn" data-t="print_btn"></button></div>
+        <div class="card-body panel-gap"><p class="note" data-t="report_note"></p><dl class="meta" id="reportMeta"></dl></div>
+      </section>
+      <section class="card">
+        <div class="card-head"><h2 data-t="letter_h"></h2>
+          <div class="row">
+            <select id="letterLang" class="btn secondary sm" aria-label="Letter language"><option value="ru">Русский</option><option value="en">English</option></select>
+            <button class="btn secondary sm" id="mkLetter" data-t="mk_letter"></button>
+            <button class="btn secondary sm" id="copyLetter" hidden data-t="copy"></button>
+          </div>
+        </div>
+        <div class="card-body panel-gap"><div class="letter" id="letter" hidden></div><p class="note" data-t="letter_note"></p></div>
+      </section>
+    </div>
+  </section>
+
 </main>
 
 <footer class="wrap">
   <p data-t="disclaimer"></p>
+  <p class="warn" id="kkNote" hidden></p>
   <p data-t="reading_note"></p>
 </footer>
 
 <div id="printReport"></div>
 
-<script type="module">
-import * as CS from "/case-store.js";
-(() => {
-  "use strict";
-  const T = {
-    ru: {
-      eyebrow:"Для экспедиторов и малых экспортёров Центральной Азии", h1a:"Груз проходит границу", h1b:"с первого раза.",
-      lead:"Проверяем комплект документов до выезда машины. Код сверяет цифры и названия, у каждого замечания есть цитата и страница. Если ошибка у партнёра, готовим письмо с просьбой подтвердить верное значение. Значений мы не предлагаем.",
-      pack:"Комплект документов", d_invoice:"Инвойс", d_packing:"Упаковочный лист", synthetic:"синтетика",
-      run:"Проверить комплект", edit_hint:"Исправьте значение в тексте и проверьте заново: результат обновится.",
-      passed_label:"Пройдено проверок", findings:"Замечания", letter_h:"Письмо партнёру", mk_letter:"Составить письмо", copy:"Копировать", copied:"Скопировано",
-      letter_note:"Письмо содержит только факты и просьбу подтвердить значения. Подставлять значения должна сторона, отвечающая за документ.",
-      inspector:"Инспектор", all_checks:"Все проверки",
-      insp_note:"Правила демонстрационные (needs_review): без источников и дат проверки. Нет подходящего правила, нет и вопроса.",
-      insp_none:"Вопросов нет.", no_rule:"Без правила в каталоге: ",
-      no_findings:"Расхождений не найдено.", fixed:"Исправлено", added:"Новое", still:"Осталось",
-      demo_label:"демо-чтение (MOCK)", meta_label:"чтение: Muse Spark",
-      ai_down:"ИИ недоступен: документы прочитаны демо-разбором по шаблону.",
-      r_auth:"Причина: ключ не принят или нет доступа к модели (401/403).", r_model:"Причина: неверный идентификатор модели META_MODEL (404).",
-      r_rate:"Причина: превышен лимит запросов (429). Попробуйте через минуту.", r_timeout:"Причина: модель не ответила вовремя.",
-      r_network:"Причина: нет связи с сервером модели.", r_server:"Причина: ошибка на стороне сервиса модели (5xx).",
-      r_bad_response:"Причина: ответ модели не по схеме.", r_bad_request:"Причина: сервис отклонил запрос (400). Возможно, модель не принимает изображения.",
-      e_client_timeout:"Ответ не пришёл вовремя. Попробуйте ещё раз.",
-      json_fb:"запасной режим JSON", json_fb_note:"Сервис модели не принял строгую схему ответа (json_schema). Документы прочитаны в запасном режиме «верни JSON»; цитаты проверены кодом так же.",
-      disclaimer:"TradeDoc AI: справка и черновики, не таможенная консультация. Все документы в примерах синтетические, компании вымышленные. Сервер документы не сохраняет; дело груза хранится только в вашем браузере.",
-      reading_note:"Режим MOCK читает текст по шаблону «Метка: значение» и не использует ИИ. Текстовый слой PDF извлекает код, без ИИ. Фото и сканы читает только модель Muse Spark в режиме META.",
-      sev_high:"высокая", sev_medium:"средняя", demo:"демо", loading:"Проверяю…", err:"Не удалось проверить. Попробуйте ещё раз.", page:"стр.",
-      sample_btn:"Пример: ",
-      drop_text:"Перетащите сюда PDF, фото или текстовые файлы.", drop_note:"До 1,5 МБ на файл. Тип документа определим по содержимому. Файлы не сохраняются.",
-      pick_files:"Выбрать файлы", pick_one:"Файл", own_file:"ваш файл",
-      reading:"Читаю файл…", st_pdf:"Из PDF: {name}, страниц: {pages}. Текст извлечён кодом, без ИИ.", st_text:"Из файла {name}.",
-      st_photo:"С фото: {name}. Прочитано моделью, подтвердите значения вручную.", st_dropped:"Отброшено полей без цитаты: {n}.",
-      st_edited:"Текст изменён вручную после загрузки.", st_placed:"{name}: определён как «{doc}».",
-      unknown_type:"{name}: не удалось определить тип документа. Загрузите его кнопкой «Файл» в нужной колонке.",
-      photo_tag:"прочитано с фото, подтвердите вручную", confirm_h:"Подтвердите вручную",
-      e_file_too_large:"Файл больше 1,5 МБ. Сожмите его или загрузите по страницам.",
-      e_unsupported_format:"Этот формат не поддерживается. Подходят PDF, JPG, PNG, WEBP и TXT.",
-      e_photo_needs_meta:"Для чтения фото нужен режим META (ключ Meta). В демо-режиме загрузите PDF с текстовым слоем или текст.",
-      e_pdf_no_text:"В PDF нет текстового слоя (похоже на скан). Загрузите страницы как фото: их читает модель в режиме META.",
-      e_pdf_unreadable:"PDF не читается: файл повреждён или защищён паролем.", e_pdf_timeout:"PDF читается слишком долго. Попробуйте файл поменьше.",
-      e_doc_too_long:"Документ длиннее 20 000 символов.", e_empty_file:"Файл пустой.",
-      e_ai_unavailable:"Модель не смогла прочитать изображение. Попробуйте ещё раз или загрузите PDF.", e_other:"Не удалось прочитать файл.",
-      case_h:"Дело груза", case_pick:"Выбрать дело", case_new:"Новое дело", case_del:"Удалить дело", case_wipe:"Удалить всё",
-      case_name:"Рейс (название, номер машины)", case_dep:"Дата выезда", case_docs:"Версии документов", case_hist:"История проверок",
-      case_note:"Дело хранится только в этом браузере (localStorage): тексты документов, версии и история проверок. На сервер оно не отправляется и там не хранится. «Удалить всё» стирает все дела на этом устройстве.",
-      case_untitled:"Рейс без названия", no_versions:"нет версий", no_checks:"Проверок ещё не было.",
-      due_in:"до выезда дней: {n}", due_today:"выезд сегодня", due_past:"дата выезда прошла",
-      wipe_confirm:"Удалить из этого браузера все дела, версии документов и историю проверок? Отменить нельзя.", del_confirm:"Удалить это дело из браузера?",
-      st_err_quota:"Не удалось сохранить: место в браузере закончилось. Удалите старые дела.",
-      st_err_unavailable:"Браузер не разрешает сохранять данные (например, приватный режим). Проверка работает, но дело не сохранится.",
-      st_err_corrupt:"Сохранённые дела повреждены и не прочитаны. Можно начать заново или нажать «Удалить всё».",
-      st_restored:"Из дела: версия v{v}{namePart}.",
-      h_changed:"изменены", h_fixed:"исправлено", h_added:"новое", h_still:"осталось замечаний", h_first:"первая проверка в деле",
-      diff_first:"{doc} v{v}: первая сохранённая версия, сравнивать не с чем.", diff_head:"{doc}: v{a} → v{b}. Удалено строк: {d}, добавлено: {p}.", diff_same:"Текст не изменился.",
-      fix_type:"Какой документ исправлен", fix_btn:"Загрузить исправленный документ", print_btn:"Печать / PDF",
-      pr_title:"TradeDoc AI: отчёт о проверке комплекта", pr_case:"Дело", pr_dep:"Дата выезда", pr_at:"Проверено", pr_mode:"Чтение",
-      pr_docs:"Документы", pr_result:"Результат", pr_passed:"Пройдено проверок: {p} из {t}. Пропущено: {s}.", pr_changes:"Изменения с прошлой проверки",
-      pr_findings:"Замечания", pr_none:"Расхождений среди проверенного не найдено.", pr_confirm:"Подтвердите вручную",
-      pr_novals:"Отчёт показывает, что и где написано. Верные значения подтверждает сторона, отвечающая за документ: система их не предлагает.",
-      mode_mock:"демо-чтение по шаблону (MOCK), не ИИ", mode_meta:"модель Muse Spark, цитаты проверены кодом",
-      src_pdf:"из PDF", src_photo:"с фото, подтвердите вручную", src_text:"текст", ql:"«", qr:"»",
-    },
-    en: {
-      eyebrow:"For freight forwarders and small exporters in Central Asia", h1a:"Your cargo crosses the border", h1b:"on the first try.",
-      lead:"We check the document pack before the truck leaves. Code compares the numbers and names, and every finding shows its quote and page. If the error is on a partner's side, we prepare a letter asking them to confirm the correct value. We never suggest values.",
-      pack:"Document pack", d_invoice:"Invoice", d_packing:"Packing list", synthetic:"synthetic",
-      run:"Check the pack", edit_hint:"Edit a value in the text and check again: the result updates.",
-      passed_label:"Checks passed", findings:"Findings", letter_h:"Letter to the partner", mk_letter:"Write the letter", copy:"Copy", copied:"Copied",
-      letter_note:"The letter contains facts only and a request to confirm the values. The party responsible for the document must supply them.",
-      inspector:"Inspector", all_checks:"All checks",
-      insp_note:"Rules are a demo set (needs_review): no sources or check dates. No matching rule means no question.",
-      insp_none:"No questions.", no_rule:"No rule in the catalog for: ",
-      no_findings:"No differences found.", fixed:"Fixed", added:"New", still:"Remaining",
-      demo_label:"demo reading (MOCK)", meta_label:"reading: Muse Spark",
-      ai_down:"AI unavailable: documents were read by the template-based demo parser.",
-      r_auth:"Reason: the key was not accepted or there is no access to the model (401/403).", r_model:"Reason: wrong model identifier in META_MODEL (404).",
-      r_rate:"Reason: request limit reached (429). Try again in a minute.", r_timeout:"Reason: the model did not answer in time.",
-      r_network:"Reason: no connection to the model server.", r_server:"Reason: the model service failed (5xx).",
-      r_bad_response:"Reason: the model's answer did not match the schema.", r_bad_request:"Reason: the service rejected the request (400). The model may not accept images.",
-      e_client_timeout:"The answer did not arrive in time. Please try again.",
-      json_fb:"JSON fallback mode", json_fb_note:"The model service did not accept the strict answer schema (json_schema). Documents were read in the \"return JSON\" fallback mode; quotes were verified by code in the same way.",
-      disclaimer:"TradeDoc AI: reference and drafts, not customs advice. All example documents are synthetic and the companies are fictional. The server does not store documents; the shipment case is kept only in your browser.",
-      reading_note:"MOCK mode reads text by a \"Label: value\" template and does not use AI. The PDF text layer is extracted by code, without AI. Photos and scans are read only by the Muse Spark model in META mode.",
-      sev_high:"high", sev_medium:"medium", demo:"demo", loading:"Checking…", err:"Could not check. Please try again.", page:"p.",
-      sample_btn:"Sample: ",
-      drop_text:"Drop PDF, photo or text files here.", drop_note:"Up to 1.5 MB per file. We detect the document type from its content. Files are not stored.",
-      pick_files:"Choose files", pick_one:"File", own_file:"your file",
-      reading:"Reading the file…", st_pdf:"From PDF: {name}, pages: {pages}. Text extracted by code, without AI.", st_text:"From file {name}.",
-      st_photo:"From photo: {name}. Read by the model, confirm the values by hand.", st_dropped:"Fields dropped for lack of a quote: {n}.",
-      st_edited:"Text edited by hand after upload.", st_placed:"{name}: detected as \"{doc}\".",
-      unknown_type:"{name}: could not detect the document type. Upload it with the \"File\" button in the right column.",
-      photo_tag:"read from a photo, confirm by hand", confirm_h:"Confirm by hand",
-      e_file_too_large:"The file is larger than 1.5 MB. Compress it or upload it page by page.",
-      e_unsupported_format:"This format is not supported. Use PDF, JPG, PNG, WEBP or TXT.",
-      e_photo_needs_meta:"Reading photos needs META mode (a Meta key). In demo mode upload a PDF with a text layer or a text file.",
-      e_pdf_no_text:"The PDF has no text layer (looks like a scan). Upload the pages as photos: the model reads them in META mode.",
-      e_pdf_unreadable:"The PDF cannot be read: it is damaged or password-protected.", e_pdf_timeout:"The PDF takes too long to read. Try a smaller file.",
-      e_doc_too_long:"The document is longer than 20,000 characters.", e_empty_file:"The file is empty.",
-      e_ai_unavailable:"The model could not read the image. Try again or upload a PDF.", e_other:"Could not read the file.",
-      case_h:"Shipment case", case_pick:"Choose a case", case_new:"New case", case_del:"Delete case", case_wipe:"Delete all",
-      case_name:"Trip (name, truck number)", case_dep:"Departure date", case_docs:"Document versions", case_hist:"Check history",
-      case_note:"The case is stored only in this browser (localStorage): document texts, versions and check history. It is not sent to or stored on the server. \"Delete all\" erases every case on this device.",
-      case_untitled:"Untitled trip", no_versions:"no versions", no_checks:"No checks yet.",
-      due_in:"days to departure: {n}", due_today:"departure today", due_past:"departure date has passed",
-      wipe_confirm:"Delete all cases, document versions and check history from this browser? This cannot be undone.", del_confirm:"Delete this case from the browser?",
-      st_err_quota:"Could not save: the browser storage is full. Delete old cases.",
-      st_err_unavailable:"The browser does not allow saving data (for example, private mode). Checks work, but the case will not be saved.",
-      st_err_corrupt:"Saved cases are damaged and could not be read. Start over or press \"Delete all\".",
-      st_restored:"From the case: version v{v}{namePart}.",
-      h_changed:"changed", h_fixed:"fixed", h_added:"new", h_still:"findings remaining", h_first:"first check in the case",
-      diff_first:"{doc} v{v}: first saved version, nothing to compare with.", diff_head:"{doc}: v{a} → v{b}. Lines removed: {d}, added: {p}.", diff_same:"The text did not change.",
-      fix_type:"Which document was corrected", fix_btn:"Upload the corrected document", print_btn:"Print / PDF",
-      pr_title:"TradeDoc AI: document pack check report", pr_case:"Case", pr_dep:"Departure date", pr_at:"Checked", pr_mode:"Reading",
-      pr_docs:"Documents", pr_result:"Result", pr_passed:"Checks passed: {p} of {t}. Skipped: {s}.", pr_changes:"Changes since the previous check",
-      pr_findings:"Findings", pr_none:"No differences found among the checked items.", pr_confirm:"Confirm by hand",
-      pr_novals:"The report shows what is written where. The party responsible for the document confirms the correct values: the system does not suggest them.",
-      mode_mock:"template-based demo reading (MOCK), not AI", mode_meta:"Muse Spark model, quotes verified by code",
-      src_pdf:"from PDF", src_photo:"from photo, confirm by hand", src_text:"text", ql:"“", qr:"”",
-    },
-  };
-  const DOCN = { ru: { invoice: "Инвойс", packing: "Упаковочный лист", cmr: "CMR" }, en: { invoice: "Invoice", packing: "Packing list", cmr: "CMR" } };
-  const $ = (s) => document.querySelector(s);
-  const ids = ["invoice", "packing", "cmr"];
-  let lang = "ru", samples = [], last = null, prevIds = null, mode = "mock", jsonFb = false, maxBytes = 1536000;
-  const sources = {};
-  try { lang = localStorage.getItem("td:lang") || "ru"; } catch {}
-  if (!T[lang]) lang = "ru";
-
-  const t = (k) => T[lang][k] ?? k;
-  function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
-
-  function applyLang() {
-    document.documentElement.lang = lang;
-    document.querySelectorAll("[data-t]").forEach((n) => { n.textContent = t(n.dataset.t); });
-    document.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
-    $("#letterLang").value = lang;
-    $("#modeBadge").textContent = last ? modeLabel(last.mode, last.jsonFallback) : modeLabel(mode, jsonFb);
-    renderSamples();
-    ids.forEach(renderSource);
-    const fx = $("#fixType").options; fx[0].textContent = DOCN[lang].invoice; fx[1].textContent = DOCN[lang].packing;
-    renderCase(); showStoreErr();
-    if (last) renderResult(last, true);
-  }
-
-  function renderSamples() {
-    const box = $("#samples"); box.textContent = "";
-    for (const s of samples) {
-      const b = el("button", "btn ghost sm", t("sample_btn") + s.label[lang]);
-      b.type = "button";
-      b.addEventListener("click", () => { fill(s); prevIds = null; last = null; $("#out").hidden = true; });
-      box.append(b);
-    }
-  }
-  function fill(s) {
-    for (const id of ids) { delete sources[id]; $("#t-" + id).value = ""; }
-    for (const d of s.docs) $("#t-" + d.type).value = d.text;
-    $("#dropStatus").textContent = ""; ids.forEach(renderSource);
-  }
-  // Что прочитано из загруженного файла. Только в памяти страницы: на сервере ничего не хранится.
-  // Если текст поправили руками, он больше не «из PDF/фото», и разбор фото не отправляется.
-  function getDocs() {
-    return ids.map((id) => {
-      const d = { type: id, text: $("#t-" + id).value }, s = sources[id];
-      if (s && s.text === d.text) { d.origin = s.origin; if (s.extraction) d.extraction = s.extraction; }
-      return d;
-    }).filter((d) => d.text.trim());
-  }
-
-  const fmt = (k, vars) => t(k).replace(/\{(\w+)\}/g, (_, v) => String(vars[v] ?? ""));
-  function renderSource(id) {
-    const s = sources[id], st = $("#s-" + id), badge = document.querySelector(`[data-src="${id}"]`);
-    badge.textContent = s ? s.name : t("synthetic");
-    badge.title = s ? t("own_file") : "";
-    st.className = "status"; st.textContent = "";
-    if (!s) return;
-    if (s.error) { st.classList.add("bad"); st.textContent = errText(s.error, s.reason); return; }
-    if (s.text !== $("#t-" + id).value) { st.textContent = t("st_edited"); return; }
-    st.textContent = s.kind === "restored" ? fmt("st_restored", { v: s.v, namePart: s.name ? " · " + s.name : "" }) + (s.origin === "photo" ? " " + t("photo_tag") : "")
-      : fmt(s.kind === "pdf" ? "st_pdf" : s.kind === "photo" ? "st_photo" : "st_text", s) + (s.dropped ? " " + fmt("st_dropped", { n: s.dropped }) : "");
-    if (s.origin === "photo") st.classList.add("photo");
-  }
-
-  // сервер ждёт модель не дольше двух попыток по META_TIMEOUT_MS (25 с); браузер ждёт сервер с запасом
-  const READ_TIMEOUT_MS = 90000, CHECK_TIMEOUT_MS = 120000;
-  const errText = (code, reason) => (T[lang]["e_" + code] ?? t("e_other")) + (reason && T[lang]["r_" + reason] ? " " + t("r_" + reason) : "");
-  const modeLabel = (m, fb) => (m === "meta" ? t("meta_label") + (fb ? " · " + t("json_fb") : "") : t("demo_label"));
-
-  async function upload(file, type) {
-    const say = (text, bad) => { const p = el("div", null, text); if (bad) p.style.color = "#ffb3ba"; $("#dropStatus").append(p); };
-    const fail = (code, reason) => { if (type) { sources[type] = { name: file.name, error: code, reason }; renderSource(type); } else say(`${file.name}: ${errText(code, reason)}`, true); };
-    if (file.size > maxBytes) return fail("file_too_large");
-    const st = type ? $("#s-" + type) : $("#dropStatus");
-    if (type) { st.className = "status"; st.textContent = t("reading"); }
-    let r;
-    try {
-      // фото читает модель: сервер ждёт её не дольше двух попыток, браузер ждёт сервер не дольше READ_TIMEOUT_MS
-      const res = await fetch("/api/read" + (type ? "?type=" + type : ""), { method: "POST", headers: { "content-type": "application/octet-stream" }, body: file, signal: AbortSignal.timeout(READ_TIMEOUT_MS) });
-      const body = await res.json().catch(() => ({}));
-      if (!res.ok) return fail(body.code || (res.status === 413 ? "file_too_large" : "other"), body.reason);
-      r = body;
-    } catch (e) { return fail(e?.name === "TimeoutError" ? "client_timeout" : "other"); }
-    const target = type || r.type;
-    if (!target) return say(fmt("unknown_type", { name: file.name }), true);
-    $("#t-" + target).value = r.text;
-    sources[target] = { name: file.name, kind: r.kind, origin: r.origin, pages: r.pages, text: r.text, extraction: r.extraction, dropped: r.dropped?.length || 0 };
-    renderSource(target);
-    if (!type) say(fmt("st_placed", { name: file.name, doc: DOCN[lang][target] }));
-  }
-  async function uploadMany(files, type) {
-    if (!type) $("#dropStatus").textContent = "";
-    for (const f of files) await upload(f, type); // по одному файлу на запрос: лимит тела запроса на хостингах
-  }
-
-  function selectQuote(doc, quote) {
-    const ta = $("#t-" + doc); if (!ta) return;
-    const i = ta.value.indexOf(quote);
-    ta.focus({ preventScroll: false });
-    if (i >= 0) ta.setSelectionRange(i, i + quote.length);
-    ta.scrollIntoView({ block: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
-  }
-
-  function evButton(e) {
-    const b = el("button", "ev"); b.type = "button";
-    b.append(el("span", null, `${DOCN[lang][e.doc] ?? e.doc} · ${t("page")} ${e.page}`), el("code", null, e.quote));
-    if (e.origin === "photo") b.append(el("span", "ph", t("photo_tag")));
-    b.addEventListener("click", () => selectQuote(e.doc, e.quote));
-    return b;
-  }
-
-  function renderResult(r, keepDiff) {
-    $("#out").hidden = false;
-    $("#modeBadge").textContent = modeLabel(r.mode, r.jsonFallback);
-    const num = $("#scoreNum"), bar = $("#scoreBar");
-    num.textContent = `${r.passed} / ${r.total}`;
-    bar.className = r.findings.length ? "bad" : "";
-    requestAnimationFrame(() => { bar.style.width = (r.total ? (r.passed / r.total) * 100 : 0) + "%"; });
-
-    const diff = $("#diff"); diff.textContent = "";
-    if (r.aiUnavailable) { const w = el("p", "warn", t("ai_down") + (r.aiError && T[lang]["r_" + r.aiError] ? " " + t("r_" + r.aiError) : "")); diff.append(w); }
-    if (r.jsonFallback) diff.append(el("p", "warn", t("json_fb_note")));
-    if (prevIds && !keepDiff) {
-      const now = new Set(r.findings.map((f) => f.id));
-      const fixed = [...prevIds].filter((x) => !now.has(x)), added = [...now].filter((x) => !prevIds.has(x)), still = [...now].filter((x) => prevIds.has(x));
-      const name = (id) => (r.checks.find((c) => c.id === id)?.title[lang]) ?? id;
-      fixed.forEach((id) => diff.append(el("span", "badge ok", `${t("fixed")}: ${name(id)}`)));
-      added.forEach((id) => diff.append(el("span", "badge high", `${t("added")}: ${name(id)}`)));
-      if (still.length) diff.append(el("span", "badge medium", `${t("still")}: ${still.length}`));
-    }
-    if (!keepDiff) prevIds = new Set(r.findings.map((f) => f.id));
-
-    const fbox = $("#findings"); fbox.textContent = "";
-    if (!r.findings.length) fbox.append(el("p", "badge ok", t("no_findings")));
-    r.findings.forEach((f, i) => {
-      const card = el("article", "f"); card.style.setProperty("--i", i);
-      const head = el("div", "row");
-      head.append(el("h3", null, f.title[lang]), el("span", "badge " + f.severity, t("sev_" + f.severity)));
-      card.append(head);
-      if (f.detail) card.append(el("p", "d", f.detail));
-      for (const e of f.evidence) card.append(evButton(e));
-      fbox.append(card);
-    });
-    // проверки, пропущенные с причиной (неоднозначный формат числа): где написано, без «правильного» значения
-    const unsure = r.checks.filter((c) => c.status === "skip" && c.reasonText);
-    if (unsure.length) {
-      const card = el("article", "f"); card.style.setProperty("--i", r.findings.length);
-      card.append(el("h3", null, t("confirm_h")));
-      for (const c of unsure) {
-        card.append(el("p", "d", `${c.title[lang]}: ${c.reasonText[lang]}`));
-        for (const e of c.evidence) card.append(evButton(e));
-      }
-      fbox.append(card);
-    }
-
-    const ibox = $("#inspector"); ibox.textContent = "";
-    if (!r.inspector.questions.length) ibox.append(el("p", "note", t("insp_none")));
-    for (const q of r.inspector.questions) {
-      const d = el("div", "q"); d.append(el("p", null, q.q[lang]));
-      const meta = el("small", null, `${q.rule} · ${t("demo")} · ${q.status}`); d.append(meta); ibox.append(d);
-    }
-    $("#inspNote").textContent = t("insp_note") + (r.inspector.noRule.length ? " " + t("no_rule") + r.inspector.noRule.join(", ") : "");
-
-    const cl = $("#checks"); cl.textContent = "";
-    for (const c of r.checks) {
-      const li = el("li", c.status); li.append(el("i", null, c.status === "pass" ? "✓" : c.status === "fail" ? "!" : c.reasonText ? "?" : "–"), el("span", null, c.title[lang] + (c.reasonText ? ` (${c.reasonText[lang]})` : "")));
-      cl.append(li);
-    }
-    $("#letter").hidden = true; $("#copyLetter").hidden = true;
-    // «исправленный документ»: по умолчанию тот, на который чаще всего ссылаются замечания
-    const cited = {}; for (const f of r.findings) for (const e of f.evidence) cited[e.doc] = (cited[e.doc] ?? 0) + 1;
-    const top = Object.entries(cited).sort((a, b) => b[1] - a[1])[0];
-    if (top && !keepDiff) $("#fixType").value = top[0];
-    last = r;
-  }
-
-  async function run() {
-    const docs = getDocs(); if (!docs.length) return;
-    const btn = $("#run"); btn.disabled = true; const old = btn.textContent; btn.textContent = t("loading");
-    $("#out").hidden = false;
-    const fbox = $("#findings"); fbox.textContent = ""; for (let i = 0; i < 3; i++) fbox.append(el("span", "sk"));
-    let r;
-    try {
-      const res = await fetch("/api/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ docs }), signal: AbortSignal.timeout(CHECK_TIMEOUT_MS) });
-      if (!res.ok) throw new Error(String(res.status));
-      r = await res.json();
-    } catch (e) { fbox.textContent = ""; fbox.append(el("p", "warn", e?.name === "TimeoutError" ? t("e_client_timeout") : t("err"))); btn.disabled = false; applyBtn(); return; }
-    // дело груза: сравнение с прошлой проверкой этого дела, новая версия документа только если текст изменился
-    const c = CS.currentCase(st) ?? CS.newCase(st, { title: $("#caseName").value, departure: $("#caseDep").value });
-    const lc = c.checks.at(-1);
-    prevIds = lc ? new Set(lc.findings.map((f) => f.id)) : null;
-    renderResult(r, false);
-    btn.disabled = false; btn.textContent = old; applyBtn();
-    const vs = CS.addVersions(c, docs.map((d) => ({ ...d, name: d.origin ? sources[d.type]?.name ?? "" : "", kind: d.origin ? sources[d.type]?.kind ?? "" : "" })));
-    CS.recordCheck(c, { ...vs, result: r });
-    persist(); renderCase();
-  }
-  const applyBtn = () => { $("#run").textContent = t("run"); };
-
-  async function mkLetter() {
-    if (!last) return;
-    const res = await fetch("/api/letter", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ findings: last.findings, lang: $("#letterLang").value }) });
-    if (!res.ok) return;
-    const box = $("#letter"); box.textContent = (await res.json()).text; box.hidden = false; $("#copyLetter").hidden = false;
-  }
-
-  document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => { lang = b.dataset.lang; try { localStorage.setItem("td:lang", lang); } catch {} applyLang(); }));
-  $("#run").addEventListener("click", run);
-
-  // файлы: общая зона (тип по содержимому) и кнопка/перетаскивание в колонку (тип задан колонкой)
-  let pickType = null;
-  $("#pickAll").addEventListener("click", () => $("#fileAll").click());
-  $("#fileAll").addEventListener("change", (e) => { uploadMany([...e.target.files], null); e.target.value = ""; });
-  let autoRun = false; // «Загрузить исправленный документ»: после загрузки сразу проверить заново
-  document.querySelectorAll("[data-pick]").forEach((b) => b.addEventListener("click", () => { pickType = b.dataset.pick; autoRun = false; $("#fileOne").click(); }));
-  $("#fixBtn").addEventListener("click", () => { pickType = $("#fixType").value; autoRun = true; $("#fileOne").click(); });
-  $("#fileOne").addEventListener("change", async (e) => {
-    const f = e.target.files[0]; e.target.value = "";
-    const go = autoRun; autoRun = false;
-    if (!f || !pickType) return;
-    const type = pickType;
-    await upload(f, type);
-    if (go && sources[type] && !sources[type].error) run();
-  });
-  function dropTarget(node, type) {
-    node.addEventListener("dragover", (e) => { e.preventDefault(); e.stopPropagation(); node.classList.add("over"); });
-    node.addEventListener("dragleave", () => node.classList.remove("over"));
-    node.addEventListener("drop", (e) => {
-      e.preventDefault(); e.stopPropagation(); node.classList.remove("over");
-      const files = [...(e.dataTransfer?.files ?? [])];
-      if (files.length) uploadMany(type ? files.slice(0, 1) : files, type);
-    });
-  }
-  dropTarget($("#drop"), null);
-  document.querySelectorAll("[data-doc]").forEach((d) => dropTarget(d, d.dataset.doc));
-  // файл, брошенный мимо зоны, браузер не должен открывать вместо страницы
-  window.addEventListener("dragover", (e) => e.preventDefault());
-  window.addEventListener("drop", (e) => e.preventDefault());
-  ids.forEach((id) => $("#t-" + id).addEventListener("input", () => renderSource(id)));
-  $("#mkLetter").addEventListener("click", mkLetter);
-  $("#copyLetter").addEventListener("click", async () => {
-    try { await navigator.clipboard.writeText($("#letter").textContent); const b = $("#copyLetter"); b.textContent = t("copied"); setTimeout(() => { b.textContent = t("copy"); }, 1500); } catch {}
-  });
-
-  // ---- дело груза: только localStorage этого браузера, на сервер не уходит ----
-  let storage = null;
-  try { storage = window.localStorage; } catch {}
-  let { state: st, error: storeErr } = CS.loadState(storage);
-  if (!storage) storeErr = "unavailable";
-  const locale = () => (lang === "ru" ? "ru-RU" : "en-GB");
-  const fmtTime = (ms) => new Date(ms).toLocaleString(locale(), { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
-  const fmtDay = (iso) => (iso ? new Date(iso + "T00:00:00").toLocaleDateString(locale()) : "—");
-  function showStoreErr() { const w = $("#caseWarn"); w.hidden = !storeErr; w.textContent = storeErr ? t("st_err_" + storeErr) : ""; }
-  function persist() {
-    if (!storage) { storeErr = "unavailable"; return showStoreErr(); }
-    const res = CS.saveState(storage, st);
-    storeErr = res.ok ? null : res.error;
-    showStoreErr();
-  }
-
-  function renderCase() {
-    const c = CS.currentCase(st);
-    const sel = $("#caseSel"); sel.textContent = "";
-    if (!st.cases.length) { const o = el("option", null, "—"); o.value = ""; sel.append(o); }
-    for (const x of [...st.cases].sort((a, b) => b.updatedAt - a.updatedAt)) {
-      const o = el("option", null, `${x.title || t("case_untitled")} · ${fmtTime(x.createdAt)}`);
-      o.value = x.id; o.selected = x.id === st.current; sel.append(o);
-    }
-    $("#caseDel").disabled = !c;
-    $("#caseName").value = c?.title ?? "";
-    $("#caseDep").value = c?.departure ?? "";
-    const n = c ? CS.daysUntil(c.departure) : null, due = $("#caseDue");
-    due.hidden = n === null;
-    due.className = "badge " + (n === null ? "" : n < 0 ? "high" : n <= 1 ? "medium" : "ok");
-    due.textContent = n === null ? "" : n > 0 ? fmt("due_in", { n }) : n === 0 ? t("due_today") : t("due_past");
-
-    const docsBox = $("#caseDocs"); docsBox.textContent = "";
-    for (const type of ids) {
-      const row = el("div", "vrow"); row.append(el("b", null, DOCN[lang][type]));
-      const list = c?.docs[type] ?? [];
-      if (!list.length) row.append(el("span", "note", t("no_versions")));
-      list.forEach((ver, i) => {
-        const b = el("button", "vchip", "v" + ver.v); b.type = "button";
-        b.title = fmtTime(ver.at) + (ver.name ? " · " + ver.name : "");
-        b.setAttribute("aria-label", `${DOCN[lang][type]} v${ver.v}, ${b.title}`);
-        if (i === list.length - 1) b.setAttribute("aria-current", "true");
-        b.addEventListener("click", () => showDiff(type, i));
-        row.append(b);
-      });
-      docsBox.append(row);
-    }
-
-    const hist = $("#caseHist"); hist.textContent = "";
-    const checks = c?.checks ?? [];
-    if (!checks.length) { const li = el("li", "note", t("no_checks")); li.style.listStyle = "none"; hist.append(li); }
-    for (let i = checks.length - 1; i >= 0; i--) {
-      const e = checks[i], prev = checks[i - 1];
-      const li = el("li");
-      li.append(el("div", null, `${fmtTime(e.at)} · ${ids.filter((x) => e.versions[x]).map((x) => `${DOCN[lang][x]} v${e.versions[x]}`).join(", ")} · ${e.passed}/${e.total}`));
-      if (prev && e.changed?.length) li.append(el("div", null, `${t("h_changed")}: ${e.changed.map((ch) => `${DOCN[lang][ch.type]} ${ch.from ? `v${ch.from} → ` : ""}v${ch.to}`).join(", ")}`));
-      if (prev) {
-        const d = CS.diffChecks(prev, e);
-        const nm = (id) => [...e.findings, ...prev.findings].find((f) => f.id === id)?.title[lang] ?? id;
-        if (d.fixed.length) li.append(el("div", "ok", `${t("h_fixed")}: ${d.fixed.map(nm).join(", ")}`));
-        if (d.added.length) li.append(el("div", "bad", `${t("h_added")}: ${d.added.map(nm).join(", ")}`));
-        li.append(el("div", null, `${t("h_still")}: ${e.findings.length}`));
-      } else li.append(el("div", null, t("h_first")));
-      hist.append(li);
-    }
-  }
-
-  // что изменилось в документе между версиями: только удалённые и добавленные строки
-  function showDiff(type, i) {
-    const c = CS.currentCase(st); if (!c) return;
-    const list = c.docs[type], cur = list[i], prev = list[i - 1];
-    const box = $("#docDiff"); box.hidden = false; box.textContent = "";
-    if (!prev) { box.append(el("div", null, fmt("diff_first", { doc: DOCN[lang][type], v: cur.v }))); return; }
-    const d = CS.lineDiff(prev.text, cur.text).filter((x) => x.op !== "same");
-    box.append(el("div", null, fmt("diff_head", { doc: DOCN[lang][type], a: prev.v, b: cur.v, d: d.filter((x) => x.op === "del").length, p: d.filter((x) => x.op === "add").length })));
-    if (!d.length) box.append(el("div", null, t("diff_same")));
-    for (const x of d) box.append(el("div", x.op, (x.op === "add" ? "+ " : "− ") + x.line));
-  }
-
-  // последние версии документов дела обратно в поля
-  function loadCaseDocs(c) {
-    for (const type of ids) {
-      const v = c ? CS.latest(c, type) : null;
-      $("#t-" + type).value = v?.text ?? "";
-      if (v && (v.name || v.origin !== "text")) sources[type] = { name: v.name, kind: "restored", v: v.v, origin: v.origin, text: v.text, extraction: v.extraction };
-      else delete sources[type];
-      renderSource(type);
-    }
-    last = null; $("#out").hidden = true; $("#docDiff").hidden = true;
-  }
-
-  $("#caseSel").addEventListener("change", (e) => {
-    if (!e.target.value) return;
-    st.current = e.target.value; persist(); renderCase(); loadCaseDocs(CS.currentCase(st));
-  });
-  $("#caseNew").addEventListener("click", () => { CS.newCase(st, {}); persist(); renderCase(); loadCaseDocs(null); $("#caseName").focus(); });
-  $("#caseDel").addEventListener("click", () => {
-    const c = CS.currentCase(st);
-    if (!c || !confirm(t("del_confirm"))) return;
-    CS.deleteCase(st, c.id); persist(); renderCase(); loadCaseDocs(CS.currentCase(st));
-  });
-  $("#caseWipe").addEventListener("click", () => {
-    if (!confirm(t("wipe_confirm"))) return;
-    if (storage) CS.clearAll(storage);
-    st = CS.emptyState(); storeErr = storage ? null : "unavailable";
-    showStoreErr(); renderCase(); loadCaseDocs(null); $("#dropStatus").textContent = "";
-  });
-  for (const [key, id] of [["title", "#caseName"], ["departure", "#caseDep"]]) {
-    $(id).addEventListener("change", () => {
-      const c = CS.currentCase(st) ?? CS.newCase(st, {});
-      CS.updateCase(c, { [key]: $(id).value }); persist(); renderCase();
-    });
-  }
-
-  // печатный отчёт: замечания с цитатами и страницами; «правильных» значений и расчётов в нём нет
-  function buildPrint() {
-    const r = last; if (!r) return false;
-    const c = CS.currentCase(st), e = c?.checks.at(-1), prev = c?.checks.at(-2);
-    const P = $("#printReport"); P.textContent = "";
-    const add = (tag, cls, text) => { const n = el(tag, cls, text); P.append(n); return n; };
-    const q = (s) => t("ql") + s + t("qr");
-    const quoteLine = (ev) => `${DOCN[lang][ev.doc] ?? ev.doc}, ${t("page")} ${ev.page}: ${q(ev.quote)}${ev.origin === "photo" ? ` (${t("photo_tag")})` : ""}`;
-    add("h1", null, t("pr_title"));
-    add("div", null, `${t("pr_case")}: ${c?.title || t("case_untitled")}`);
-    add("div", null, `${t("pr_dep")}: ${fmtDay(c?.departure)}`);
-    add("div", null, `${t("pr_at")}: ${new Date(e?.at ?? Date.now()).toLocaleString(locale())}`);
-    add("div", null, `${t("pr_mode")}: ${r.mode === "meta" ? t("mode_meta") : t("mode_mock")}`);
-    if (r.aiUnavailable) add("div", null, t("ai_down"));
-    add("h2", null, t("pr_docs"));
-    for (const type of ids) {
-      const v = c ? CS.latest(c, type) : null; if (!v) continue;
-      add("div", null, `${DOCN[lang][type]} v${v.v}${v.name ? " · " + v.name : ""} · ${t("src_" + (v.origin || "text"))}`);
-    }
-    add("h2", null, t("pr_result"));
-    add("div", null, fmt("pr_passed", { p: r.passed, t: r.total, s: r.skipped }));
-    if (prev && e) {
-      const d = CS.diffChecks(prev, e);
-      const nm = (id) => [...e.findings, ...prev.findings].find((f) => f.id === id)?.title[lang] ?? id;
-      add("h2", null, t("pr_changes"));
-      add("div", null, `${t("h_fixed")}: ${d.fixed.map(nm).join(", ") || "—"}`);
-      add("div", null, `${t("h_added")}: ${d.added.map(nm).join(", ") || "—"}`);
-      add("div", null, `${t("h_still")}: ${e.findings.length}`);
-    }
-    add("h2", null, t("pr_findings"));
-    if (!r.findings.length) add("div", null, t("pr_none"));
-    r.findings.forEach((f, i) => {
-      const b = add("div", "pf");
-      b.append(el("div", null, `${i + 1}. ${f.title[lang]} · ${t("sev_" + f.severity)}`));
-      for (const ev of f.evidence) b.append(el("div", "q", quoteLine(ev)));
-    });
-    const unsure = r.checks.filter((x) => x.status === "skip" && x.reasonText);
-    if (unsure.length) {
-      add("h2", null, t("pr_confirm"));
-      for (const x of unsure) {
-        const b = add("div", "pf");
-        b.append(el("div", null, `${x.title[lang]}: ${x.reasonText[lang]}`));
-        for (const ev of x.evidence) b.append(el("div", "q", quoteLine(ev)));
-      }
-    }
-    add("p", "muted", t("pr_novals"));
-    add("p", "muted", t("disclaimer"));
-    return true;
-  }
-  $("#printBtn").addEventListener("click", () => { if (buildPrint()) window.print(); });
-
-  (async () => {
-    try { const c = await (await fetch("/api/config")).json(); mode = c.aiMode; jsonFb = !!c.jsonFallback; maxBytes = c.maxFileBytes || maxBytes; } catch {}
-    try { samples = await (await fetch("/api/samples")).json(); } catch {}
-    applyLang();
-    const c = CS.currentCase(st);
-    if (c && ids.some((x) => c.docs[x].length)) loadCaseDocs(c);
-    else if (samples[1]) fill(samples[1]);
-  })();
-})();
-</script>
+<script type="module" src="/app.js"></script>
 </body>
 </html>

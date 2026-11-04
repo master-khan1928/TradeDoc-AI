@@ -165,3 +165,8 @@ test("№5: удалённые строки веса не показываютс
   await expect(page.locator("#diff")).not.toContainText("Исправлено: Вес брутто");
   await expect(page.locator("#diff")).toContainText("Больше не удалось проверить");
 });
+
+test("№10: вторая страница того же типа не заменяет первую молча", async ({ page }) => {
+  await page.locator("#fileAll").setInputFiles([demo("01-invoice.pdf"), demo("01-invoice.pdf")]);
+  await expect(page.locator("#dropStatus")).toContainText("заменил");
+});

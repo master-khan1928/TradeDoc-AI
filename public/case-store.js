@@ -90,7 +90,12 @@ export function clearAll(storage) {
 
 const validDate = (s) => /^\d{4}-\d{2}-\d{2}$/.test(String(s)) && !Number.isNaN(Date.parse(s));
 
+/**
+ * Новое дело. При лимите дел ничего не удаляется автоматически: возвращается null, и страница предлагает
+ * пользователю самому удалить ненужное дело (документы и история проверок пользователя не исчезают молча).
+ */
 export function newCase(state, { title = "", departure = "", now = Date.now() } = {}) {
+  if (state.cases.length >= LIMITS.cases) return null;
   const c = {
     id: `c${now.toString(36)}${Math.random().toString(36).slice(2, 7)}`,
     title: String(title).slice(0, 120), departure: validDate(departure) ? departure : "",
@@ -100,11 +105,6 @@ export function newCase(state, { title = "", departure = "", now = Date.now() } 
   };
   state.cases.push(c);
   state.current = c.id;
-  // старые дела сверх лимита удаляются: место в браузере ограничено
-  if (state.cases.length > LIMITS.cases) {
-    state.cases.sort((a, b) => a.updatedAt - b.updatedAt);
-    state.cases.splice(0, state.cases.length - LIMITS.cases);
-  }
   return c;
 }
 

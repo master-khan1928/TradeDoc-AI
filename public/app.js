@@ -163,11 +163,15 @@ import { mockExtract } from "/shared/mock.js";
     ru: { stale_note: "Документы изменились после проверки: результат устарел. Печать и письмо недоступны до новой проверки.",
       discarded_note: "Ответ проверки пришёл после смены дела или документов и не применён. Запустите проверку заново.",
       not_saved: "Результат не сохранён в деле.", lost: "Больше не удалось проверить", h_lost: "больше не удалось проверить",
-      consent_stopped: "Согласие отозвано: загрузка остальных файлов остановлена.", draft_restored: "Восстановлен несохранённый черновик документов этого дела." },
+      consent_stopped: "Согласие отозвано: загрузка остальных файлов остановлена.",
+      case_limit: "Достигнут лимит дел в браузере (20). Удалите ненужное дело на вкладке «Дело груза»: старые дела сами не удаляются.",
+      page_replaced: "{name} заменил ранее загруженный «{doc}»: страницы одного документа не объединяются. Загрузите многостраничный документ одним PDF.", draft_restored: "Восстановлен несохранённый черновик документов этого дела." },
     en: { stale_note: "The documents changed after the check: the result is out of date. Print and letter are unavailable until a new check.",
       discarded_note: "The check answer arrived after the case or documents changed and was not applied. Run the check again.",
       not_saved: "The result was not saved to the case.", lost: "Could no longer be checked", h_lost: "could no longer be checked",
-      consent_stopped: "Consent withdrawn: uploading the remaining files was stopped.", draft_restored: "An unsaved draft of this case's documents was restored." },
+      consent_stopped: "Consent withdrawn: uploading the remaining files was stopped.",
+      case_limit: "The browser case limit (20) is reached. Delete a case you no longer need on the Shipment case tab: old cases are not deleted automatically.",
+      page_replaced: "{name} replaced the earlier \"{doc}\": pages of one document are not merged. Upload a multi-page document as one PDF.", draft_restored: "An unsaved draft of this case's documents was restored." },
   };
   for (const k of Object.keys(STATE_I18N)) Object.assign(T[k], STATE_I18N[k]);
   const DOCN = { kk: { invoice: "Инвойс", packing: "Қаптама парағы", cmr: "CMR" }, ru: { invoice: "Инвойс", packing: "Упаковочный лист", cmr: "CMR" }, en: { invoice: "Invoice", packing: "Packing list", cmr: "CMR" } };
@@ -345,6 +349,7 @@ import { mockExtract } from "/shared/mock.js";
     } catch (e) { return fail(e?.name === "TimeoutError" ? "client_timeout" : "other"); }
     const target = type || r.type;
     if (!target) return say(fmt("unknown_type", { name: file.name }), true);
+    if (sources[target]?.origin && !sources[target].error) say(fmt("page_replaced", { name: file.name, doc: DOCN[lang][target] }), true);
     $("#t-" + target).value = r.text;
     sources[target] = { name: file.name, size: file.size, kind: r.kind, origin: r.origin, pages: r.pages, text: r.text, extraction: r.extraction, dropped: r.dropped?.length || 0, sha256: r.sha256 };
     renderSource(target); docsChanged();
@@ -621,6 +626,13 @@ import { mockExtract } from "/shared/mock.js";
     }
     // дело груза: сравнение с прошлой проверкой этого дела, новая версия документа только если текст изменился
     const c = c0 ?? CS.newCase(st, { title: $("#caseName").value, departure: $("#caseDep").value });
+    if (!c) {
+      stale = false; prevIds = null; lastEntry = null; lastCaseId = null;
+      renderResult(r, false); showTab("check");
+      document.querySelectorAll(".save-warn").forEach((n) => n.remove());
+      note("save-warn", `${t("not_saved")} ${t("case_limit")}`);
+      return;
+    }
     const lc = c.checks.at(-1);
     prevIds = lc ? new Set(lc.findings.map((f) => f.id)) : null;
     stale = false;
@@ -783,7 +795,10 @@ import { mockExtract } from "/shared/mock.js";
     if (!e.target.value) return;
     st.current = e.target.value; persist(); renderCase(); loadCaseDocs(CS.currentCase(st));
   });
-  $("#caseNew").addEventListener("click", () => { CS.newCase(st, {}); persist(); renderCase(); loadCaseDocs(null); $("#caseName").focus(); });
+  $("#caseNew").addEventListener("click", () => {
+    if (!CS.newCase(st, {})) { const w = $("#caseWarn"); w.hidden = false; w.textContent = t("case_limit"); return; }
+    persist(); renderCase(); loadCaseDocs(null); $("#caseName").focus();
+  });
   $("#caseDel").addEventListener("click", () => {
     const c = CS.currentCase(st);
     if (!c || !confirm(t("del_confirm"))) return;
@@ -829,6 +844,7 @@ import { mockExtract } from "/shared/mock.js";
   for (const [key, id] of [["title", "#caseName"], ["departure", "#caseDep"]]) {
     $(id).addEventListener("change", () => {
       const c = CS.currentCase(st) ?? CS.newCase(st, {});
+      if (!c) { const w = $("#caseWarn"); w.hidden = false; w.textContent = t("case_limit"); return; }
       CS.updateCase(c, { [key]: $(id).value }); persist(); renderCase();
     });
   }
@@ -889,7 +905,7 @@ import { mockExtract } from "/shared/mock.js";
       add("div", "muted", `${t("pr_log_rules")}: ${r.run.rules.source} · ${r.run.rules.version}`);
       if (r.run.packSha256) add("div", "muted", `${t("pr_pack")}: ${r.run.packSha256}`);
       add("div", "muted", t("pr_log_docs") + ":");
-      for (const d of r.run.docs) add("div", "q", `${DOCN[lang][d.type] ?? d.type} (${d.origin}): ${d.textSha256}${d.fileSha256 ? ` · ${d.fileSha256}` : ""}`);
+      for (const d of r.run.docs) add("div", "q", `${DOCN[lang][d.type] ?? d.type} (${d.origin}${d.mode ? ` · ${d.mode}` : ""}): ${d.textSha256}${d.fileSha256 ? ` · ${d.fileSha256}` : ""}`);
     }
     add("p", "muted", t("disclaimer_short"));
     add("p", "muted", t("pr_novals"));
